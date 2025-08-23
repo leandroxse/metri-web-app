@@ -1,0 +1,16 @@
+<svg width="32" height="32" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Metri">
+  <defs>
+    <linearGradient id="emeraldA" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#00A86B"/>
+      <stop offset="58%" stop-color="#0FAE96"/>
+      <stop offset="100%" stop-color="#7FE6C5"/>
+    </linearGradient>
+    <linearGradient id="specA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,.18)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="1024" height="1024" rx="204" fill="url(#emeraldA)"/>
+  <rect x="0" y="0" width="1024" height="480" rx="204" fill="url(#specA)"/>
+  <path d="M256 784 L256 320 C256 280 320 280 340 320 L512 680 L684 320 C704 280 768 280 768 320 L768 784" fill="none" stroke="#FFFFFF" stroke-width="160" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

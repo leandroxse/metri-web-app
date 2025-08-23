@@ -1,0 +1,227 @@
+"use client"
+
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { DatePickerMobile } from "@/components/ui/date-picker-mobile"
+import { Plus, Minus, Calendar, Clock } from "lucide-react"
+import type { Event } from "@/types/event"
+import type { Category } from "@/types/category"
+
+interface EventFormProps {
+  initialData?: Event
+  onSubmit: (data: Omit<Event, "id" | "createdAt" | "updatedAt">) => void
+  categories: Category[]
+}
+
+export function EventForm({ initialData, onSubmit, categories }: EventFormProps) {
+  // Puxar data atual como padrão
+  const today = new Date().toISOString().split('T')[0]
+  
+  const [formData, setFormData] = useState({
+    title: initialData?.title || "",
+    description: initialData?.description || "",
+    date: initialData?.date || today,
+    startTime: initialData?.startTime || "",
+    endTime: initialData?.endTime || "",
+    location: initialData?.location || "",
+    status: initialData?.status || "planejado" as const,
+    staffAssignments: initialData?.staffAssignments || [],
+  })
+
+  const handleStaffAssignmentChange = (categoryId: string, count: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      staffAssignments:
+        count === 0
+          ? prev.staffAssignments.filter((assignment) => assignment.categoryId !== categoryId)
+          : prev.staffAssignments.some((assignment) => assignment.categoryId === categoryId)
+            ? prev.staffAssignments.map((assignment) =>
+                assignment.categoryId === categoryId ? { ...assignment, count } : assignment,
+              )
+            : [...prev.staffAssignments, { categoryId, count }],
+    }))
+  }
+
+  const getStaffCount = (categoryId: string) => {
+    const assignment = formData.staffAssignments.find((a) => a.categoryId === categoryId)
+    return assignment?.count || 0
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Horários não são mais obrigatórios
+    if (formData.title.trim() && formData.date && formData.location.trim()) {
+      onSubmit(formData)
+    }
+  }
+
+  const totalStaff = formData.staffAssignments.reduce((sum, assignment) => sum + assignment.count, 0)
+  // Removido cálculo de custo total pois hourlyRate foi removido
+
+  return (
+    <div className="bg-background rounded-lg p-4 border border-border">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Header compacto */}
+        <div className="mb-4">
+          <h3 className="text-base font-medium text-foreground mb-1 flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-primary" />
+            Informações Básicas
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Defina os dados principais do evento
+          </p>
+        </div>
+
+        {/* Basic Event Info - layout mais compacto */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-sm font-medium">Título do Evento *</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+              placeholder="Ex: Casamento Silva, Festa Corporativa..."
+              className="h-9"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location" className="text-sm font-medium">Local *</Label>
+            <Input
+              id="location"
+              value={formData.location}
+              onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
+              placeholder="Ex: Salão de Festas, Hotel..."
+              className="h-9"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Section divider */}
+        <div className="border-t border-border my-4"></div>
+
+        {/* Header compacto para Data e Hora */}
+        <div className="mb-4">
+          <h3 className="text-base font-medium text-foreground mb-1 flex items-center gap-2">
+            <Clock className="w-4 h-4 text-primary" />
+            Data e Horário
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Configure quando o evento irá acontecer
+          </p>
+        </div>
+
+        {/* Date and Time - layout mais compacto */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="date" className="text-sm font-medium">Data *</Label>
+            <DatePickerMobile
+              value={formData.date}
+              onChange={(date) => setFormData((prev) => ({ ...prev, date }))}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="startTime" className="text-sm font-medium">Início</Label>
+              <Input
+                id="startTime"
+                type="time"
+                value={formData.startTime}
+                onChange={(e) => setFormData((prev) => ({ ...prev, startTime: e.target.value }))}
+                className="h-9"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="endTime" className="text-sm font-medium">Término</Label>
+              <Input
+                id="endTime"
+                type="time"
+                value={formData.endTime}
+                onChange={(e) => setFormData((prev) => ({ ...prev, endTime: e.target.value }))}
+                className="h-9"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Status do Evento</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { value: "planejado", label: "Planejado", color: "blue" },
+                { value: "em_progresso", label: "Em Progresso", color: "green" },
+                { value: "finalizado", label: "Finalizado", color: "gray" },
+                { value: "cancelado", label: "Cancelado", color: "red" }
+              ].map((status) => (
+                <button
+                  key={status.value}
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, status: status.value as any }))}
+                  className={`
+                    p-2 rounded text-xs font-medium transition-all border text-center
+                    ${formData.status === status.value
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-background text-muted-foreground border-border hover:border-primary/50'
+                    }
+                  `}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <div className={`w-2 h-2 rounded-full ${
+                      status.color === 'blue' ? 'bg-blue-500' :
+                      status.color === 'green' ? 'bg-green-500' :
+                      status.color === 'gray' ? 'bg-gray-500' : 'bg-red-500'
+                    }`} />
+                    {status.label}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Section divider */}
+        <div className="border-t border-border my-4"></div>
+
+        {/* Header compacto para Descrição */}
+        <div className="mb-4">
+          <h3 className="text-base font-medium text-foreground mb-1 flex items-center gap-2">
+            <Plus className="w-4 h-4 text-primary" />
+            Detalhes Adicionais
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Adicione informações extras sobre o evento
+          </p>
+        </div>
+
+        {/* Description */}
+        <div className="space-y-2">
+          <Label htmlFor="description" className="text-sm font-medium">Descrição</Label>
+          <Textarea
+            id="description"
+            value={formData.description}
+            onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+            placeholder="Detalhes adicionais sobre o evento, observações especiais, requisitos..."
+            rows={3}
+            className="resize-none"
+          />
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex justify-end gap-3 pt-4 mt-4 border-t border-border">
+          <Button type="submit" className="min-w-32">
+            {initialData ? "Atualizar" : "Criar"} Evento
+          </Button>
+        </div>
+      </form>
+    </div>
+  )
+}
