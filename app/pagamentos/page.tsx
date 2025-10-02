@@ -10,8 +10,6 @@ import {
   BarChart3
 } from "lucide-react"
 import { AnimatedContainer } from "@/components/ui/animated-container"
-import { AnimatedNumber } from "@/components/ui/animated-number"
-import { AnimatedIcon } from "@/components/ui/animated-icon"
 import { PaymentEventSelector } from "@/components/payment-event-selector"
 import { PaymentList } from "@/components/payment-list"
 import { useEvents } from "@/hooks/use-events"
@@ -324,13 +322,11 @@ export default function PagamentosPage() {
                 <div>
                   <p className="text-xs font-medium text-blue-700 dark:text-blue-300 oled:text-blue-200 mb-1">Total Geral</p>
                   <p className="text-xl font-bold text-blue-900 dark:text-blue-100 oled:text-blue-100">
-                    <AnimatedNumber value={globalStats.totalAmount} prefix="R$ " precision={2} duration={1.5} />
+                    R$ {globalStats.totalAmount.toFixed(2)}
                   </p>
                 </div>
                 <div className="p-2 bg-blue-500/10 dark:bg-blue-400/20 oled:bg-blue-400/30 rounded-lg">
-                  <AnimatedIcon variant="bounce">
-                    <DollarSign className="w-5 h-5 text-blue-600 dark:text-blue-400 oled:text-blue-300" />
-                  </AnimatedIcon>
+                  <DollarSign className="w-5 h-5 text-blue-600 dark:text-blue-400 oled:text-blue-300" />
                 </div>
               </div>
             </motion.div>
@@ -355,13 +351,11 @@ export default function PagamentosPage() {
                 <div>
                   <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300 oled:text-emerald-200 mb-1">Pagamentos Realizados</p>
                   <p className="text-xl font-bold text-emerald-900 dark:text-emerald-100 oled:text-emerald-100">
-                    <AnimatedNumber value={globalStats.paidAmount} prefix="R$ " precision={2} duration={1.5} />
+                    R$ {globalStats.paidAmount.toFixed(2)}
                   </p>
                 </div>
                 <div className="p-2 bg-emerald-500/10 dark:bg-emerald-400/20 oled:bg-emerald-400/30 rounded-lg">
-                  <AnimatedIcon variant="pulse">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 oled:text-emerald-300" />
-                  </AnimatedIcon>
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 oled:text-emerald-300" />
                 </div>
               </div>
             </motion.div>
@@ -386,13 +380,11 @@ export default function PagamentosPage() {
                 <div>
                   <p className="text-xs font-medium text-amber-700 dark:text-amber-300 oled:text-amber-200 mb-1">Pendentes</p>
                   <p className="text-xl font-bold text-amber-900 dark:text-amber-100 oled:text-amber-100">
-                    <AnimatedNumber value={globalStats.pendingAmount} prefix="R$ " precision={2} duration={1.5} />
+                    R$ {globalStats.pendingAmount.toFixed(2)}
                   </p>
                 </div>
                 <div className="p-2 bg-amber-500/10 dark:bg-amber-400/20 oled:bg-amber-400/30 rounded-lg">
-                  <AnimatedIcon variant="wobble">
-                    <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400 oled:text-amber-300" />
-                  </AnimatedIcon>
+                  <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400 oled:text-amber-300" />
                 </div>
               </div>
             </motion.div>
@@ -417,13 +409,11 @@ export default function PagamentosPage() {
                 <div>
                   <p className="text-xs font-medium text-purple-700 dark:text-purple-300 oled:text-purple-200 mb-1">Taxa de Conclusão</p>
                   <p className="text-xl font-bold text-purple-900 dark:text-purple-100 oled:text-purple-100">
-                    <AnimatedNumber value={globalStats.completionRate} precision={1} suffix="%" duration={1.5} />
+                    {globalStats.completionRate.toFixed(1)}%
                   </p>
                 </div>
                 <div className="p-2 bg-purple-500/10 dark:bg-purple-400/20 oled:bg-purple-400/30 rounded-lg">
-                  <AnimatedIcon variant="bounce">
-                    <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400 oled:text-purple-300" />
-                  </AnimatedIcon>
+                  <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400 oled:text-purple-300" />
                 </div>
               </div>
             </motion.div>
