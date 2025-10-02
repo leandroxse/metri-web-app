@@ -196,3 +196,36 @@
     min-height: max(4rem, calc(3.5rem + env(safe-area-inset-bottom)));
   }
 }
+
+/* Tablet Optimization - Full Width Support */
+@media (min-width: 768px) {
+  .tablet-full-width {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Remove constraints on tablet landscape */
+  @media (orientation: landscape) {
+    .container-responsive {
+      max-width: 100% !important;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+}
+
+/* Tablet Portrait - Optimize for vertical space */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .container-responsive {
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Large Tablet & Desktop */
+@media (min-width: 1024px) {
+  .container-responsive {
+    max-width: 1400px;
+  }
+}

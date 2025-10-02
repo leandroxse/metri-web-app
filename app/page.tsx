@@ -132,7 +132,7 @@ export default function HomePage() {
   
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-4 pb-20">
+      <div className="container-responsive mx-auto p-4 pb-20 md:px-6 lg:px-8">
         {/* Header Integrado */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}

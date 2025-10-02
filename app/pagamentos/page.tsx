@@ -362,7 +362,7 @@ export default function PagamentosPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-3 py-4 max-w-7xl">
+      <div className="container-responsive mx-auto px-3 py-4 md:px-6 lg:px-8">
         {/* Statistics Cards with Stagger Animation */}
         <AnimatedContainer delay={0} className="mb-4">
           <motion.div 
