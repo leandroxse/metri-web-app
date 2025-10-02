@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { supabase } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft } from "lucide-react"
 import { MenuEditor } from "@/components/menu-editor"
 
-export default function EditMenuPage() {
+function EditMenuContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [menus, setMenus] = useState<any[]>([])
@@ -66,5 +66,13 @@ export default function EditMenuPage() {
         <MenuEditor menuId={selectedMenuId} onUpdate={loadMenus} />
       )}
     </div>
+  )
+}
+
+export default function EditMenuPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto p-6">Carregando...</div>}>
+      <EditMenuContent />
+    </Suspense>
   )
 }
