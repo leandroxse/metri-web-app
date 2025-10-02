@@ -246,23 +246,34 @@ export default function PagamentosPage() {
     return { total, paid, pending, paidCount, totalCount }
   }
 
-  // Calcular estatísticas globais
+  // Calcular estatísticas do evento selecionado
   const globalStats = useMemo(() => {
+    if (!selectedEvent) {
+      return {
+        totalAmount: 0,
+        paidAmount: 0,
+        pendingAmount: 0,
+        totalPeople: 0,
+        paidPeople: 0,
+        pendingPeople: 0,
+        completionRate: 0
+      }
+    }
+
+    const eventPayments = localPayments.get(selectedEvent) || []
     let totalAmount = 0
     let paidAmount = 0
     let totalPeople = 0
     let paidPeople = 0
 
-    for (const [eventId, eventPayments] of localPayments) {
-      eventPayments.forEach(payment => {
-        totalAmount += payment.amount
-        totalPeople += 1
-        if (payment.isPaid) {
-          paidAmount += payment.amount
-          paidPeople += 1
-        }
-      })
-    }
+    eventPayments.forEach(payment => {
+      totalAmount += payment.amount
+      totalPeople += 1
+      if (payment.isPaid) {
+        paidAmount += payment.amount
+        paidPeople += 1
+      }
+    })
 
     return {
       totalAmount,
@@ -273,7 +284,7 @@ export default function PagamentosPage() {
       pendingPeople: totalPeople - paidPeople,
       completionRate: totalAmount > 0 ? (paidAmount / totalAmount) * 100 : 0
     }
-  }, [localPayments])
+  }, [localPayments, selectedEvent])
 
   // Contador de pagamentos por evento
   const eventPaymentsCount = useMemo(() => {
