@@ -174,7 +174,7 @@ export default function HomePage() {
           </div>
           
           {/* Métricas integradas */}
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
             <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
               <AnimatedNumber 
                 value={totalActiveEvents} 
@@ -227,7 +227,7 @@ export default function HomePage() {
                   </Badge>
                 </div>
                 
-                <div className="grid grid-cols-7 gap-3">
+                <div className="grid grid-cols-7 gap-1 md:gap-2 lg:gap-3">
                   {weekDays.map((day, index) => {
                     const eventCount = getEventCount(day)
                     const peopleCount = getPeopleCount(day)
@@ -407,7 +407,7 @@ export default function HomePage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-8"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4"
             >
               {/* Próximos Eventos Integrado */}
               <div className="bg-card/50 backdrop-blur-sm rounded-lg p-6 border border-border/50">

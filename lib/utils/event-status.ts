@@ -60,12 +60,12 @@ export function shouldAutoFinalize(event: Event): boolean {
  * 🔄 FILTROS PARA DIFERENTES CONTEXTOS
  */
 
-// Para aba de pagamentos - eventos ativos
+// Para aba de pagamentos - APENAS eventos finalizados
 export function isRelevantForPayments(event: Event): boolean {
-  return event.status !== 'cancelado' && event.status !== 'finalizado'
+  return event.status === 'finalizado'
 }
 
-// Para histórico de pagamentos - eventos finalizados
+// Para histórico de pagamentos - eventos finalizados e cancelados
 export function isRelevantForPaymentHistory(event: Event): boolean {
   return event.status === 'finalizado' || event.status === 'cancelado'
 }

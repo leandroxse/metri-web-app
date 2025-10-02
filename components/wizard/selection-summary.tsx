@@ -1,0 +1,565 @@
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ChevronUp, Check, ShoppingBag, Download, Share2, Sparkles, List } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+interface Category {
+  id: string
+  name: string
+  recommended_count: number
+  items: Array<{
+    id: string
+    name: string
+    description?: string | null
+  }>
+}
+
+interface SelectionSummaryProps {
+  categories: Category[]
+  selections: Set<string>
+  onSubmit: () => void
+  totalItems: number
+  eventTitle?: string
+  menuName?: string
+}
+
+export function SelectionSummary({
+  categories,
+  selections,
+  onSubmit,
+  totalItems,
+  eventTitle,
+  menuName
+}: SelectionSummaryProps) {
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [isDesktopOpen, setIsDesktopOpen] = useState(false)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+
+  const selectedByCategory = categories.map(cat => ({
+    name: cat.name,
+    recommended: cat.recommended_count,
+    selected: cat.items.filter(item => selections.has(item.id)),
+    total: cat.items.length
+  })).filter(cat => cat.selected.length > 0)
+
+  const totalSelected = selections.size
+  const totalRecommended = categories.reduce((sum, cat) => sum + cat.recommended_count, 0)
+
+  const handleConfirmSubmit = () => {
+    setIsConfirmOpen(false)
+    onSubmit()
+  }
+
+  const exportToPDF = () => {
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Seleção de Cardápio - ${eventTitle || 'Evento'}</title>
+          <style>
+            @page {
+              size: A4;
+              margin: 0;
+            }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+              padding: 20px 30px;
+              line-height: 1.3;
+              color: #333;
+              height: 100vh;
+              display: flex;
+              flex-direction: column;
+            }
+            .header {
+              border-bottom: 2px solid #059669;
+              padding-bottom: 10px;
+              margin-bottom: 15px;
+            }
+            h1 {
+              color: #059669;
+              font-size: 22px;
+              margin-bottom: 4px;
+            }
+            .subtitle {
+              color: #666;
+              font-size: 13px;
+              line-height: 1.2;
+            }
+            .summary {
+              background: #f3f4f6;
+              padding: 8px 12px;
+              border-radius: 6px;
+              margin-bottom: 15px;
+              display: flex;
+              gap: 25px;
+            }
+            .summary-item {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            }
+            .summary-label {
+              font-size: 11px;
+              color: #666;
+              text-transform: uppercase;
+            }
+            .summary-value {
+              font-size: 16px;
+              font-weight: bold;
+              color: #059669;
+            }
+            .content {
+              flex: 1;
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+              gap: 12px;
+              margin-bottom: 10px;
+            }
+            .category {
+              break-inside: avoid;
+            }
+            .category-header {
+              background: #059669;
+              color: white;
+              padding: 6px 10px;
+              border-radius: 4px;
+              margin-bottom: 8px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .category-name {
+              font-size: 14px;
+              font-weight: 600;
+            }
+            .category-count {
+              background: rgba(255,255,255,0.25);
+              padding: 2px 8px;
+              border-radius: 10px;
+              font-size: 11px;
+            }
+            .items-list {
+              list-style: none;
+            }
+            .item {
+              padding: 4px 8px;
+              border-left: 2px solid #10b981;
+              margin-bottom: 4px;
+              background: #f9fafb;
+              font-size: 12px;
+            }
+            .item-name {
+              font-weight: 500;
+              color: #111827;
+            }
+            .footer {
+              border-top: 1px solid #e5e7eb;
+              padding-top: 8px;
+              text-align: center;
+              color: #6b7280;
+              font-size: 10px;
+            }
+            @media print {
+              body {
+                padding: 20px 30px;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Seleção de Cardápio</h1>
+            <div class="subtitle">${eventTitle || 'Evento'}${menuName ? ` • ${menuName}` : ''}</div>
+          </div>
+
+          <div class="summary">
+            <div class="summary-item">
+              <span class="summary-label">Total:</span>
+              <span class="summary-value">${totalSelected}</span>
+            </div>
+            ${totalRecommended > 0 ? `
+              <div class="summary-item">
+                <span class="summary-label">Recomendado:</span>
+                <span class="summary-value">${totalRecommended}</span>
+              </div>
+            ` : ''}
+            <div class="summary-item">
+              <span class="summary-label">Categorias:</span>
+              <span class="summary-value">${selectedByCategory.length}</span>
+            </div>
+          </div>
+
+          <div class="content">
+            ${selectedByCategory.map(cat => `
+              <div class="category">
+                <div class="category-header">
+                  <div class="category-name">${cat.name}</div>
+                  <div class="category-count">
+                    ${cat.selected.length}${cat.recommended > 0 ? `/${cat.recommended}` : ''}
+                  </div>
+                </div>
+                <ul class="items-list">
+                  ${cat.selected.map(item => `
+                    <li class="item">
+                      <div class="item-name">✓ ${item.name}</div>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="footer">
+            ${new Date().toLocaleDateString('pt-BR', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
+        </body>
+      </html>
+    `
+
+    printWindow.document.write(html)
+    printWindow.document.close()
+
+    printWindow.onload = () => {
+      printWindow.focus()
+      printWindow.print()
+    }
+  }
+
+  return (
+    <>
+      {/* Mobile/Tablet - Bottom Sheet */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-background via-background to-transparent backdrop-blur-sm">
+        <div className="container-responsive mx-auto px-4 py-4">
+          <div className="bg-card rounded-2xl shadow-2xl border-2 border-primary/20 p-4 relative overflow-hidden">
+            {/* Logo Marca d'água - Mobile */}
+            <img
+              src="/prime-logo.png"
+              alt="Prime Buffet"
+              className="absolute right-2 bottom-2 h-8 w-auto opacity-10 pointer-events-none"
+            />
+
+            <div className="flex items-center justify-between gap-3 mb-3 relative z-10">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <div>
+                  <p className="font-bold text-lg">{totalSelected} selecionados</p>
+                  {totalRecommended > 0 && (
+                    <p className="text-xs text-muted-foreground">Recomendado: {totalRecommended}</p>
+                  )}
+                </div>
+              </div>
+              <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    Ver Todos <ChevronUp className="w-4 h-4 ml-1" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>Suas Seleções</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-4 space-y-4">
+                    {selectedByCategory.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-8">
+                        Nenhum item selecionado ainda
+                      </p>
+                    ) : (
+                      selectedByCategory.map((cat, index) => (
+                        <div key={index} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-semibold">{cat.name}</h3>
+                            <Badge variant="outline">
+                              {cat.selected.length}
+                              {cat.recommended > 0 && ` / ${cat.recommended}`}
+                            </Badge>
+                          </div>
+                          <ul className="space-y-1 pl-4">
+                            {cat.selected.map((item) => (
+                              <li key={item.id} className="text-sm flex items-center gap-2">
+                                <Check className="w-3 h-3 text-primary" />
+                                {item.name}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 relative z-10">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exportToPDF}
+                disabled={totalSelected === 0}
+              >
+                <Download className="w-4 h-4 mr-1" />
+                PDF
+              </Button>
+              <Button
+                onClick={() => setIsConfirmOpen(true)}
+                disabled={totalSelected === 0}
+                size="sm"
+              >
+                <Check className="w-4 h-4 mr-1" />
+                Finalizar
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop - Sticky Footer */}
+      <div className="hidden lg:block fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-background via-background/95 to-transparent backdrop-blur-lg border-t-2 border-primary/20 shadow-2xl">
+        <div className="container-responsive mx-auto px-8 py-6 relative">
+          {/* Logo Marca d'água - Desktop */}
+          <img
+            src="/prime-logo.png"
+            alt="Prime Buffet"
+            className="absolute left-8 top-1/2 -translate-y-1/2 h-12 w-auto opacity-20 pointer-events-none"
+          />
+
+          <div className="flex items-center justify-between">
+            {/* Summary Info */}
+            <div className="flex items-center gap-8 ml-32">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-8 h-8 text-primary" />
+                <div>
+                  <div className="text-sm text-muted-foreground">Total Selecionado</div>
+                  <div className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                    {totalSelected}
+                  </div>
+                </div>
+              </div>
+              {totalRecommended > 0 && (
+                <>
+                  <div className="h-14 w-px bg-border" />
+                  <div>
+                    <div className="text-sm text-muted-foreground">Recomendado</div>
+                    <div className="text-3xl font-bold text-primary">{totalRecommended}</div>
+                  </div>
+                </>
+              )}
+              <div className="h-14 w-px bg-border" />
+              <div className="flex flex-wrap gap-2 max-w-md">
+                {selectedByCategory.slice(0, 4).map((cat, index) => (
+                  <Badge key={index} variant="secondary" className="text-sm px-3 py-1">
+                    {cat.name}: {cat.selected.length}
+                  </Badge>
+                ))}
+                {selectedByCategory.length > 4 && (
+                  <Badge variant="outline" className="text-sm px-3 py-1">
+                    +{selectedByCategory.length - 4}
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              <Dialog open={isDesktopOpen} onOpenChange={setIsDesktopOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    disabled={totalSelected === 0}
+                  >
+                    <List className="w-5 h-5 mr-2" />
+                    Ver Todos
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl">Suas Seleções</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-6 space-y-6">
+                    {selectedByCategory.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-12">
+                        Nenhum item selecionado ainda
+                      </p>
+                    ) : (
+                      selectedByCategory.map((cat, index) => (
+                        <div key={index} className="space-y-3">
+                          <div className="flex items-center justify-between border-b pb-2">
+                            <h3 className="font-bold text-lg">{cat.name}</h3>
+                            <Badge variant="secondary" className="text-sm">
+                              {cat.selected.length} selecionado{cat.selected.length !== 1 ? 's' : ''}
+                              {cat.recommended > 0 && ` • Recomendado: ${cat.recommended}`}
+                            </Badge>
+                          </div>
+                          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {cat.selected.map((item) => (
+                              <li key={item.id} className="text-sm flex items-center gap-2 bg-muted/50 rounded-lg p-2">
+                                <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                                <span>{item.name}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={exportToPDF}
+                disabled={totalSelected === 0}
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Exportar PDF
+              </Button>
+              <Button
+                size="lg"
+                onClick={() => setIsConfirmOpen(true)}
+                disabled={totalSelected === 0}
+                className="shadow-lg"
+              >
+                <Check className="w-5 h-5 mr-2" />
+                Finalizar Seleção
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal de Confirmação - Resumo Final */}
+      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-2xl">
+              <ShoppingBag className="w-6 h-6 text-primary" />
+              Confirmar Seleção
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Resumo Geral */}
+            <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-6 border-2 border-primary/20">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">Resumo da sua seleção</h3>
+                  <p className="text-sm text-muted-foreground">{eventTitle}</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-primary">{totalSelected}</div>
+                  <div className="text-xs text-muted-foreground">itens selecionados</div>
+                </div>
+              </div>
+
+              {totalRecommended > 0 && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-muted-foreground">
+                    Recomendação do evento: {totalRecommended} itens
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Lista de Categorias e Itens */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-lg flex items-center gap-2">
+                <List className="w-5 h-5" />
+                Itens selecionados por categoria
+              </h4>
+
+              {selectedByCategory.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Nenhum item selecionado
+                </div>
+              ) : (
+                selectedByCategory.map((cat, index) => (
+                  <div key={index} className="border rounded-lg p-4 bg-card">
+                    <div className="flex items-center justify-between mb-3 pb-2 border-b">
+                      <h5 className="font-semibold text-base">{cat.name}</h5>
+                      <Badge variant="secondary" className="text-sm">
+                        {cat.selected.length} {cat.selected.length === 1 ? 'item' : 'itens'}
+                        {cat.recommended > 0 && ` • Recomendado: ${cat.recommended}`}
+                      </Badge>
+                    </div>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {cat.selected.map((item) => (
+                        <li key={item.id} className="flex items-start gap-2 text-sm">
+                          <Check className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                          <div>
+                            <div className="font-medium">{item.name}</div>
+                            {item.description && (
+                              <div className="text-xs text-muted-foreground line-clamp-1">
+                                {item.description}
+                              </div>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Mensagem de Confirmação */}
+            <div className="bg-amber-50 dark:bg-amber-950/20 border-2 border-amber-200 dark:border-amber-800 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-lg">!</span>
+                </div>
+                <div>
+                  <h5 className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                    Tem certeza que deseja finalizar?
+                  </h5>
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    Ao confirmar, suas escolhas serão enviadas para o organizador do evento.
+                    Você poderá alterar suas seleções posteriormente acessando o mesmo link.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Botões de Ação */}
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setIsConfirmOpen(false)}
+                className="flex-1"
+              >
+                Revisar Seleção
+              </Button>
+              <Button
+                size="lg"
+                onClick={handleConfirmSubmit}
+                disabled={totalSelected === 0}
+                className="flex-1 bg-primary hover:bg-primary/90"
+              >
+                <Check className="w-5 h-5 mr-2" />
+                Confirmar e Finalizar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}

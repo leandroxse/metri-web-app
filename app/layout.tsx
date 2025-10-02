@@ -3,10 +3,11 @@ import type { Metadata, Viewport } from "next"
 import { Geist, Manrope } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { BottomNavigation } from "@/components/bottom-navigation"
+import { ConditionalNav } from "@/components/conditional-nav"
+import { ConditionalMain } from "@/components/conditional-main"
 import "./globals.css"
 import { OfflineBanner } from "@/components/offline-banner"
 import { IOSInstallPrompt } from "@/components/ios-install-prompt"
-import { FullscreenTrigger } from "@/components/fullscreen-trigger"
 import "@/lib/utils/debug"
 
 const geist = Geist({
@@ -182,22 +183,25 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#059669" />
         <meta name="msapplication-tap-highlight" content="no" />
+
+        {/* Android fullscreen mode */}
+        <meta name="theme-color" content="#059669" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#10b981" media="(prefers-color-scheme: dark)" />
       </head>
       <body className="antialiased bg-background" suppressHydrationWarning>
-        <ThemeProvider 
-          attribute="class" 
-          defaultTheme="system" 
-          enableSystem 
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
           disableTransitionOnChange
           themes={['light', 'dark', 'oled', 'system']}
         >
-          <FullscreenTrigger />
           <div className="min-h-screen pb-20 pt-safe-or-4 pb-safe-or-20">
             <OfflineBanner />
-            <main className="px-4">
+            <ConditionalMain>
               {children}
-            </main>
-            <BottomNavigation />
+            </ConditionalMain>
+            <ConditionalNav />
             <IOSInstallPrompt />
           </div>
         </ThemeProvider>

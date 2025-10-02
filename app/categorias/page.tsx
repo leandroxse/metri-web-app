@@ -286,8 +286,8 @@ export default function CategoriasPage() {
             </motion.div>
           </AnimatedContainer>
         ) : (
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6"
             initial="initial"
             animate="animate"
             variants={{
@@ -377,7 +377,7 @@ export default function CategoriasPage() {
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-4 md:p-5 lg:p-6">
                       <div className="flex items-center justify-between">
                         <motion.div
                           whileHover={{ scale: 1.05 }}
@@ -399,7 +399,7 @@ export default function CategoriasPage() {
 
         {/* Edit Dialog with Animation */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-white via-white to-slate-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800/30 oled:from-black oled:via-black oled:to-gray-900/20 border-0 ring-1 ring-gray-200/50 dark:ring-gray-700/50 oled:ring-gray-600/30">
+          <DialogContent className="max-w-lg md:max-w-2xl lg:max-w-3xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-white via-white to-slate-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800/30 oled:from-black oled:via-black oled:to-gray-900/20 border-0 ring-1 ring-gray-200/50 dark:ring-gray-700/50 oled:ring-gray-600/30">
             <DialogHeader className="pb-6 border-b border-gray-100 dark:border-gray-800 oled:border-gray-700">
               <DialogTitle className="flex items-center gap-3 text-xl font-semibold bg-gradient-to-r from-emerald-600 to-emerald-700 dark:from-emerald-400 dark:to-emerald-500 oled:from-emerald-300 oled:to-emerald-400 bg-clip-text text-transparent">
                 <div className="p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 oled:from-emerald-400 oled:to-emerald-500 rounded-lg shadow-md">
@@ -419,7 +419,7 @@ export default function CategoriasPage() {
 
         {/* People Management Dialog with Animation */}
         <Dialog open={isPeopleDialogOpen} onOpenChange={setIsPeopleDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-gradient-to-br from-white via-white to-slate-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800/30 oled:from-black oled:via-black oled:to-gray-900/20 border-0 ring-1 ring-gray-200/50 dark:ring-gray-700/50 oled:ring-gray-600/30">
+          <DialogContent className="max-w-lg md:max-w-4xl lg:max-w-5xl max-h-[80vh] overflow-y-auto bg-gradient-to-br from-white via-white to-slate-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800/30 oled:from-black oled:via-black oled:to-gray-900/20 border-0 ring-1 ring-gray-200/50 dark:ring-gray-700/50 oled:ring-gray-600/30">
             <DialogHeader className="pb-6 border-b border-gray-100 dark:border-gray-800 oled:border-gray-700">
               <DialogTitle className="flex items-center gap-3 text-xl font-semibold bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-400 dark:to-blue-500 oled:from-blue-300 oled:to-blue-400 bg-clip-text text-transparent">
                 <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 oled:from-blue-400 oled:to-blue-500 rounded-lg shadow-md">

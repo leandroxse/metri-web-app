@@ -4,7 +4,6 @@
   "description": "Sistema profissional para gestão de eventos e equipes operacionais",
   "start_url": "/",
   "display": "standalone",
-  "display_override": ["fullscreen", "standalone", "minimal-ui"],
   "background_color": "#ffffff",
   "theme_color": "#059669",
   "prefer_related_applications": false,

@@ -444,7 +444,7 @@ export const eventService = {
     const { data, error } = await supabase
       .from('events')
       .select(`
-        id, title, description, date, start_time, end_time, location, status, created_at, updated_at,
+        id, title, description, date, start_time, end_time, location, status, guest_count, price_per_person, created_at, updated_at,
         event_staff (
           category_id,
           quantity
@@ -452,12 +452,12 @@ export const eventService = {
       `)
       .order('date', { ascending: false })
       .order('start_time')
-    
+
     if (error) {
       logError('eventService.getAll', error)
       return []
     }
-    
+
     // Transformar os dados para incluir staffAssignments
     const events = (data || []).map(event => ({
       ...event,
@@ -466,7 +466,7 @@ export const eventService = {
         count: staff.quantity
       }))
     }))
-    
+
     // Remover event_staff do objeto final
     return events.map(({ event_staff, ...event }) => event) as Event[]
   },
@@ -480,7 +480,7 @@ export const eventService = {
     const { data, error } = await supabase
       .from('events')
       .select(`
-        id, title, description, date, start_time, end_time, location, status, created_at, updated_at,
+        id, title, description, date, start_time, end_time, location, status, guest_count, price_per_person, created_at, updated_at,
         event_staff (
           category_id,
           quantity
@@ -488,14 +488,14 @@ export const eventService = {
       `)
       .eq('id', id)
       .single()
-    
+
     if (error) {
       logError('eventService.getById', error, { id })
       return null
     }
-    
+
     if (!data) return null
-    
+
     // Transformar os dados para incluir staffAssignments
     const event = {
       ...data,
@@ -504,7 +504,7 @@ export const eventService = {
         count: staff.quantity
       }))
     }
-    
+
     // Remover event_staff do objeto final
     const { event_staff, ...finalEvent } = event
     return finalEvent as Event
@@ -522,19 +522,21 @@ export const eventService = {
     }
 
     // Separar staffAssignments do event e converter campos camelCase para snake_case
-    const { staffAssignments, startTime, endTime, ...restEventData } = event as any
+    const { staffAssignments, startTime, endTime, guestCount, pricePerPerson, ...restEventData } = event as any
     const eventData = {
       ...restEventData,
       start_time: startTime || event.start_time || null,
-      end_time: endTime || event.end_time || null
+      end_time: endTime || event.end_time || null,
+      guest_count: guestCount !== undefined ? guestCount : event.guest_count || null,
+      price_per_person: pricePerPerson !== undefined ? pricePerPerson : event.price_per_person || null
     }
 
     const { data, error } = await supabase
       .from('events')
       .insert([eventData])
-      .select('id, title, description, date, start_time, end_time, location, status, created_at, updated_at')
+      .select('id, title, description, date, start_time, end_time, location, status, guest_count, price_per_person, created_at, updated_at')
       .single()
-    
+
     if (error) {
       logError('eventService.create', error, { event })
       return null
@@ -579,11 +581,13 @@ export const eventService = {
     }
 
     // Separar staffAssignments dos updates e converter campos camelCase para snake_case
-    const { staffAssignments, startTime, endTime, ...restUpdates } = updates as any
+    const { staffAssignments, startTime, endTime, guestCount, pricePerPerson, ...restUpdates } = updates as any
     const eventUpdates = {
       ...restUpdates,
       ...(startTime !== undefined && { start_time: startTime || null }),
-      ...(endTime !== undefined && { end_time: endTime || null })
+      ...(endTime !== undefined && { end_time: endTime || null }),
+      ...(guestCount !== undefined && { guest_count: guestCount }),
+      ...(pricePerPerson !== undefined && { price_per_person: pricePerPerson })
     }
 
     const { data, error } = await supabase
@@ -591,14 +595,14 @@ export const eventService = {
       .update(eventUpdates)
       .eq('id', id)
       .select(`
-        id, title, description, date, start_time, end_time, location, status, created_at, updated_at,
+        id, title, description, date, start_time, end_time, location, status, guest_count, price_per_person, created_at, updated_at,
         event_staff (
           category_id,
           quantity
         )
       `)
       .single()
-    
+
     if (error) {
       logError('eventService.update', error, { id, updates })
       return null
@@ -635,14 +639,14 @@ export const eventService = {
     // Transformar os dados para incluir staffAssignments
     const event = {
       ...data,
-      staffAssignments: staffAssignments !== undefined 
-        ? staffAssignments 
+      staffAssignments: staffAssignments !== undefined
+        ? staffAssignments
         : (data.event_staff || []).map(staff => ({
             category_id: staff.category_id,
             count: staff.quantity
           }))
     }
-    
+
     // Remover event_staff do objeto final
     const { event_staff, ...finalEvent } = event
     return finalEvent as Event

@@ -103,7 +103,7 @@ export function PeopleManager({ category }: PeopleManagerProps) {
               Adicionar Pessoa
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-background border-border">
+          <DialogContent className="bg-background border-border max-w-lg md:max-w-3xl lg:max-w-5xl">
             <DialogHeader>
               <DialogTitle className="text-foreground">Adicionar Pessoa</DialogTitle>
               <DialogDescription className="text-muted-foreground">

@@ -7,7 +7,7 @@
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { Home, Calendar, Users, Settings, Download, DollarSign } from "lucide-react"
+import { Home, Calendar, Users, Settings, Download, DollarSign, ChefHat } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 
@@ -84,6 +84,12 @@ export function BottomNavigation() {
       icon: DollarSign,
       label: "Pagamentos",
       active: pathname === "/pagamentos"
+    },
+    {
+      href: "/cardapios",
+      icon: ChefHat,
+      label: "Cardápios",
+      active: pathname === "/cardapios"
     },
     {
       href: "/configuracoes",

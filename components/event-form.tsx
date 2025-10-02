@@ -32,6 +32,8 @@ export function EventForm({ initialData, onSubmit, categories }: EventFormProps)
     endTime: initialData?.endTime || "",
     location: initialData?.location || "",
     status: initialData?.status || "planejado" as const,
+    guestCount: initialData?.guest_count || null,
+    pricePerPerson: initialData?.price_per_person || null,
     staffAssignments: initialData?.staffAssignments || [],
   })
 
@@ -82,26 +84,53 @@ export function EventForm({ initialData, onSubmit, categories }: EventFormProps)
         {/* Basic Event Info - layout mais compacto */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="title" className="text-sm font-medium">Título do Evento *</Label>
+            <Label htmlFor="title" className="text-sm font-medium text-foreground">Título do Evento *</Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
               placeholder="Ex: Casamento Silva, Festa Corporativa..."
-              className="h-9"
+              className="h-10 bg-background border-2 border-input focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location" className="text-sm font-medium">Local *</Label>
+            <Label htmlFor="location" className="text-sm font-medium text-foreground">Local *</Label>
             <Input
               id="location"
               value={formData.location}
               onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
               placeholder="Ex: Salão de Festas, Hotel..."
-              className="h-9"
+              className="h-10 bg-background border-2 border-input focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="guestCount" className="text-sm font-medium text-foreground">Número de Pessoas</Label>
+            <Input
+              id="guestCount"
+              type="number"
+              min="1"
+              value={formData.guestCount || ""}
+              onChange={(e) => setFormData((prev) => ({ ...prev, guestCount: e.target.value ? Number(e.target.value) : null }))}
+              placeholder="Ex: 100, 200..."
+              className="h-10 bg-background border-2 border-input focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="pricePerPerson" className="text-sm font-medium text-foreground">Preço por Pessoa (R$)</Label>
+            <Input
+              id="pricePerPerson"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.pricePerPerson || ""}
+              onChange={(e) => setFormData((prev) => ({ ...prev, pricePerPerson: e.target.value ? Number(e.target.value) : null }))}
+              placeholder="Ex: 50.00, 75.50..."
+              className="h-10 bg-background border-2 border-input focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
         </div>

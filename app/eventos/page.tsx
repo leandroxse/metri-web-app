@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Plus, Calendar, MapPin, Clock, Users, Edit, Trash2, Search, UserCheck, TrendingUp } from "lucide-react"
+import { ArrowLeft, Plus, Calendar, MapPin, Clock, Users, Edit, Trash2, Search, UserCheck, TrendingUp, ChefHat, Eye } from "lucide-react"
 import { CompactMetricCard } from "@/components/metric-card"
 import { AnimatedCard } from "@/components/ui/animated-card"
 import { AnimatedContainer } from "@/components/ui/animated-container"
@@ -17,6 +17,8 @@ import Link from "next/link"
 import { EventForm } from "@/components/event-form"
 import { EventCalendar } from "@/components/event-calendar"
 import { TeamManager } from "@/components/team-manager"
+import { EventMenuLink } from "@/components/event-menu-link"
+import { EventMenuSelections } from "@/components/event-menu-selections"
 import { useEvents } from "@/hooks/use-events"
 import { useCategories } from "@/hooks/use-categories"
 import type { Event } from "@/types/event"
@@ -36,6 +38,10 @@ export default function EventosPage() {
   const [deletingEvent, setDeletingEvent] = useState<Event | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [activeView, setActiveView] = useState<"list" | "calendar">("list")
+  const [menuLinkEvent, setMenuLinkEvent] = useState<Event | null>(null)
+  const [isMenuLinkDialogOpen, setIsMenuLinkDialogOpen] = useState(false)
+  const [viewingSelectionsEvent, setViewingSelectionsEvent] = useState<Event | null>(null)
+  const [isSelectionsDialogOpen, setIsSelectionsDialogOpen] = useState(false)
 
   // Calculate statistics
   const upcomingEvents = events.filter(event => {
@@ -136,8 +142,8 @@ export default function EventosPage() {
       <div className="container-responsive mx-auto px-3 py-4 md:px-6 lg:px-8">
         {/* Modern Statistics - Mobile Optimized with Stagger Animation */}
         <AnimatedContainer delay={0} className="mb-4">
-          <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6"
             initial={false}
             animate={"animate"}
             variants={{
@@ -264,7 +270,7 @@ export default function EventosPage() {
                 Novo
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader className="pb-3 border-b border-border">
                 <DialogTitle className="flex items-center gap-2 text-lg font-medium">
                   <Plus className="w-4 h-4 text-primary" />
@@ -446,7 +452,33 @@ export default function EventosPage() {
                             </div>
                             
                             {/* Botões de ação compactos */}
-                            <div className="flex items-center gap-1 flex-shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center gap-2 flex-shrink-0 transition-all md:hover:scale-105">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setViewingSelectionsEvent(event)
+                                  setIsSelectionsDialogOpen(true)
+                                }}
+                                title="Ver seleções do cliente"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setMenuLinkEvent(event)
+                                  setIsMenuLinkDialogOpen(true)
+                                }}
+                                title="Gerar link do cardápio"
+                              >
+                                <ChefHat className="w-4 h-4" />
+                              </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -487,7 +519,7 @@ export default function EventosPage() {
 
         {/* Edit Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader className="pb-3 border-b border-border">
               <DialogTitle className="flex items-center gap-2 text-lg font-medium">
                 <Edit className="w-4 h-4 text-primary" />
@@ -507,7 +539,7 @@ export default function EventosPage() {
 
         {/* Team Manager Dialog */}
         <Dialog open={!!managingTeamEvent} onOpenChange={(open) => !open && setManagingTeamEvent(null)}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-lg md:max-w-4xl lg:max-w-5xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
@@ -530,6 +562,26 @@ export default function EventosPage() {
           </DialogContent>
         </Dialog>
 
+        {/* Menu Link Dialog */}
+        {menuLinkEvent && (
+          <EventMenuLink
+            open={isMenuLinkDialogOpen}
+            onOpenChange={setIsMenuLinkDialogOpen}
+            eventId={menuLinkEvent.id}
+            eventName={menuLinkEvent.title}
+          />
+        )}
+
+        {/* Menu Selections Dialog */}
+        {viewingSelectionsEvent && (
+          <EventMenuSelections
+            open={isSelectionsDialogOpen}
+            onOpenChange={setIsSelectionsDialogOpen}
+            eventId={viewingSelectionsEvent.id}
+            eventName={viewingSelectionsEvent.title}
+          />
+        )}
+
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogContent>
@@ -545,7 +597,7 @@ export default function EventosPage() {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction 
+              <AlertDialogAction
                 onClick={handleDeleteEvent}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
