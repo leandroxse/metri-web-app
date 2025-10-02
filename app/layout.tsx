@@ -6,6 +6,7 @@ import { BottomNavigation } from "@/components/bottom-navigation"
 import "./globals.css"
 import { OfflineBanner } from "@/components/offline-banner"
 import { IOSInstallPrompt } from "@/components/ios-install-prompt"
+import { FullscreenTrigger } from "@/components/fullscreen-trigger"
 import "@/lib/utils/debug"
 
 const geist = Geist({
@@ -190,6 +191,7 @@ export default function RootLayout({
           disableTransitionOnChange
           themes={['light', 'dark', 'oled', 'system']}
         >
+          <FullscreenTrigger />
           <div className="min-h-screen pb-20 pt-safe-or-4 pb-safe-or-20">
             <OfflineBanner />
             <main className="px-4">
