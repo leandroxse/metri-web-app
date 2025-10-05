@@ -253,30 +253,30 @@ export function SelectionSummary({
   return (
     <>
       {/* Mobile/Tablet - Bottom Sheet */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-lg">
-        <div className="container-responsive mx-auto px-2 md:px-3 py-1.5 md:py-2">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-sm">
+        <div className="container-responsive mx-auto px-2 md:px-2.5 py-1 md:py-1.5">
           <div className="relative">
             {/* Logo Marca d'água - Mobile */}
             <img
               src="/prime-logo.png"
               alt="Prime Buffet"
-              className="absolute right-1 bottom-1 md:right-1.5 md:bottom-1.5 h-5 md:h-6 w-auto opacity-10 pointer-events-none"
+              className="absolute right-1 bottom-0.5 md:right-1.5 md:bottom-1 h-4 md:h-5 w-auto opacity-10 pointer-events-none"
             />
 
-            <div className="flex items-center justify-between gap-1.5 md:gap-2 mb-1.5 md:mb-2 relative z-10">
+            <div className="flex items-center justify-between gap-1.5 md:gap-2 mb-1 md:mb-1.5 relative z-10">
               <div className="flex items-center gap-1 md:gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
+                <Sparkles className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary" />
                 <div>
-                  <p className="font-bold text-sm md:text-base">{totalSelected} selecionados</p>
+                  <p className="font-bold text-xs md:text-sm leading-none">{totalSelected} selecionados</p>
                   {totalRecommended > 0 && (
-                    <p className="text-[9px] md:text-[10px] text-muted-foreground">Recomendado: {totalRecommended}</p>
+                    <p className="text-[8px] md:text-[9px] text-muted-foreground leading-none mt-0.5">Recomendado: {totalRecommended}</p>
                   )}
                 </div>
               </div>
               <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-7 md:h-8 text-[11px] md:text-xs px-2">
-                    Ver Todos <ChevronUp className="w-3 h-3 ml-1" />
+                  <Button variant="outline" size="sm" className="h-6 md:h-7 text-[10px] md:text-[11px] px-1.5 md:px-2">
+                    Ver Todos <ChevronUp className="w-2.5 h-2.5 md:w-3 md:h-3 ml-0.5 md:ml-1" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto">
@@ -314,48 +314,48 @@ export function SelectionSummary({
               </Sheet>
             </div>
 
-            <div className="flex items-center gap-1 md:gap-1.5 relative z-10">
+            <div className="flex items-center gap-0.5 md:gap-1 relative z-10">
               {/* Navegação */}
-              <div className="flex gap-0.5 md:gap-1">
+              <div className="flex gap-0.5">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={onPrevCategory}
                   disabled={activeCategoryIndex === 0}
-                  className="h-6 w-6 md:h-7 md:w-7 p-0"
+                  className="h-5 w-5 md:h-6 md:w-6 p-0"
                 >
-                  <ChevronLeft className="w-3 h-3" />
+                  <ChevronLeft className="w-2.5 h-2.5 md:w-3 md:h-3" />
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={onNextCategory}
                   disabled={activeCategoryIndex === totalCategories - 1}
-                  className="h-6 w-6 md:h-7 md:w-7 p-0"
+                  className="h-5 w-5 md:h-6 md:w-6 p-0"
                 >
-                  <ChevronRight className="w-3 h-3" />
+                  <ChevronRight className="w-2.5 h-2.5 md:w-3 md:h-3" />
                 </Button>
               </div>
 
               {/* Ações */}
-              <div className="grid grid-cols-2 gap-1 md:gap-1.5 flex-1">
+              <div className="grid grid-cols-2 gap-0.5 md:gap-1 flex-1">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={exportToPDF}
                   disabled={totalSelected === 0}
-                  className="h-6 md:h-7 text-[11px] md:text-xs px-2"
+                  className="h-5 md:h-6 text-[10px] md:text-[11px] px-1.5 md:px-2"
                 >
-                  <Download className="w-3 h-3 mr-1" />
+                  <Download className="w-2.5 h-2.5 md:w-3 md:h-3 mr-0.5 md:mr-1" />
                   PDF
                 </Button>
                 <Button
                   onClick={() => setIsConfirmOpen(true)}
                   disabled={totalSelected === 0}
                   size="sm"
-                  className="h-6 md:h-7 text-[11px] md:text-xs px-2"
+                  className="h-5 md:h-6 text-[10px] md:text-[11px] px-1.5 md:px-2"
                 >
-                  <Check className="w-3 h-3 mr-1" />
+                  <Check className="w-2.5 h-2.5 md:w-3 md:h-3 mr-0.5 md:mr-1" />
                   Finalizar
                 </Button>
               </div>
@@ -365,7 +365,7 @@ export function SelectionSummary({
       </div>
 
       {/* Desktop - Sticky Footer */}
-      <div className="hidden lg:block fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-background via-background/95 to-transparent backdrop-blur-lg border-t-2 border-primary/20 shadow-2xl">
+      <div className="hidden lg:block fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-sm">
         <div className="container-responsive mx-auto px-8 py-6 relative">
           {/* Logo Marca d'água - Desktop */}
           <img
