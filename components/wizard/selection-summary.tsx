@@ -364,73 +364,74 @@ export function SelectionSummary({
         </div>
       </div>
 
-      {/* Desktop - Sticky Footer */}
+      {/* Desktop/Tablet - Sticky Footer */}
       <div className="hidden lg:block fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-sm">
-        <div className="container-responsive mx-auto px-8 py-6 relative">
+        <div className="container-responsive mx-auto px-4 py-2 relative">
           {/* Logo Marca d'água - Desktop */}
           <img
             src="/prime-logo.png"
             alt="Prime Buffet"
-            className="absolute left-8 top-1/2 -translate-y-1/2 h-12 w-auto opacity-20 pointer-events-none"
+            className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-auto opacity-15 pointer-events-none"
           />
 
           <div className="flex items-center justify-between">
             {/* Summary Info */}
-            <div className="flex items-center gap-8 ml-32">
-              <div className="flex items-center gap-3">
-                <Sparkles className="w-8 h-8 text-primary" />
+            <div className="flex items-center gap-4 ml-20">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" />
                 <div>
-                  <div className="text-sm text-muted-foreground">Total Selecionado</div>
-                  <div className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                  <div className="text-[10px] text-muted-foreground leading-none">Total Selecionado</div>
+                  <div className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent leading-none mt-1">
                     {totalSelected}
                   </div>
                 </div>
               </div>
               {totalRecommended > 0 && (
                 <>
-                  <div className="h-14 w-px bg-border" />
+                  <div className="h-8 w-px bg-border" />
                   <div>
-                    <div className="text-sm text-muted-foreground">Recomendado</div>
-                    <div className="text-3xl font-bold text-primary">{totalRecommended}</div>
+                    <div className="text-[10px] text-muted-foreground leading-none">Recomendado</div>
+                    <div className="text-xl font-bold text-primary leading-none mt-1">{totalRecommended}</div>
                   </div>
                 </>
               )}
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {/* Navegação Desktop */}
-              <div className="flex gap-2">
+              <div className="flex gap-1">
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={onPrevCategory}
                   disabled={activeCategoryIndex === 0}
-                  className="h-10 w-10"
+                  className="h-7 w-7"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-4 h-4" />
                 </Button>
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={onNextCategory}
                   disabled={activeCategoryIndex === totalCategories - 1}
-                  className="h-10 w-10"
+                  className="h-7 w-7"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
 
-              <div className="h-10 w-px bg-border" />
+              <div className="h-7 w-px bg-border" />
 
               <Dialog open={isDesktopOpen} onOpenChange={setIsDesktopOpen}>
                 <DialogTrigger asChild>
                   <Button
                     variant="outline"
-                    size="lg"
+                    size="sm"
                     disabled={totalSelected === 0}
+                    className="h-7"
                   >
-                    <List className="w-5 h-5 mr-2" />
+                    <List className="w-3.5 h-3.5 mr-1.5" />
                     Ver Todos
                   </Button>
                 </DialogTrigger>
@@ -469,20 +470,21 @@ export function SelectionSummary({
               </Dialog>
               <Button
                 variant="outline"
-                size="lg"
+                size="sm"
                 onClick={exportToPDF}
                 disabled={totalSelected === 0}
+                className="h-7"
               >
-                <Download className="w-5 h-5 mr-2" />
+                <Download className="w-3.5 h-3.5 mr-1.5" />
                 Exportar PDF
               </Button>
               <Button
-                size="lg"
+                size="sm"
                 onClick={() => setIsConfirmOpen(true)}
                 disabled={totalSelected === 0}
-                className="shadow-lg"
+                className="h-7"
               >
-                <Check className="w-5 h-5 mr-2" />
+                <Check className="w-3.5 h-3.5 mr-1.5" />
                 Finalizar Seleção
               </Button>
             </div>
