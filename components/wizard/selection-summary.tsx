@@ -395,19 +395,6 @@ export function SelectionSummary({
                   </div>
                 </>
               )}
-              <div className="h-14 w-px bg-border" />
-              <div className="flex flex-wrap gap-2 max-w-md">
-                {selectedByCategory.slice(0, 4).map((cat, index) => (
-                  <Badge key={index} variant="secondary" className="text-sm px-3 py-1">
-                    {cat.name}: {cat.selected.length}
-                  </Badge>
-                ))}
-                {selectedByCategory.length > 4 && (
-                  <Badge variant="outline" className="text-sm px-3 py-1">
-                    +{selectedByCategory.length - 4}
-                  </Badge>
-                )}
-              </div>
             </div>
 
             {/* Action Buttons */}

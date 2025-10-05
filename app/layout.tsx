@@ -3,9 +3,10 @@ import type { Metadata, Viewport } from "next"
 import { Geist, Manrope } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { BottomNavigation } from "@/components/bottom-navigation"
-import { Sidebar } from "@/components/sidebar"
+import { ConditionalSidebar } from "@/components/conditional-sidebar"
 import { ConditionalNav } from "@/components/conditional-nav"
 import { ConditionalMain } from "@/components/conditional-main"
+import { ConditionalLayoutWrapper } from "@/components/conditional-layout-wrapper"
 import "./globals.css"
 import { OfflineBanner } from "@/components/offline-banner"
 import { IOSInstallPrompt } from "@/components/ios-install-prompt"
@@ -197,18 +198,18 @@ export default function RootLayout({
           disableTransitionOnChange
           themes={['light', 'dark', 'oled', 'system']}
         >
-          {/* Sidebar - Tablet/Desktop apenas */}
-          <Sidebar />
+          {/* Sidebar - Tablet/Desktop apenas (condicional) */}
+          <ConditionalSidebar />
 
-          {/* Main Content - Com padding lateral no desktop */}
-          <div className="min-h-screen pb-20 md:pb-0 pt-safe-or-4 md:pl-64">
+          {/* Main Content - Com padding condicional */}
+          <ConditionalLayoutWrapper>
             <OfflineBanner />
             <ConditionalMain>
               {children}
             </ConditionalMain>
             <ConditionalNav />
             <IOSInstallPrompt />
-          </div>
+          </ConditionalLayoutWrapper>
         </ThemeProvider>
       </body>
     </html>
