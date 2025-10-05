@@ -9,10 +9,60 @@ import { requestNotificationPermission, isNotificationSupported, getNotification
  */
 export function NotificationManager() {
   const [hasAskedPermission, setHasAskedPermission] = useState(false)
+  const [swReady, setSwReady] = useState(false)
+
+  // Garantir que Service Worker está ativo e controlando a página
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
+
+    const ensureServiceWorkerControl = async () => {
+      try {
+        // Esperar SW estar pronto
+        const registration = await navigator.serviceWorker.ready
+        console.log('🔧 [SW] Service Worker registrado e pronto!')
+
+        // Verificar se há controller
+        if (!navigator.serviceWorker.controller) {
+          console.log('⚠️ [SW] Sem controller - registrando novamente...')
+
+          // Registrar SW se não estiver registrado
+          const reg = await navigator.serviceWorker.register('/sw.js')
+
+          // Aguardar instalação
+          if (reg.installing) {
+            console.log('📥 [SW] Instalando...')
+            await new Promise((resolve) => {
+              reg.installing!.addEventListener('statechange', (e) => {
+                if ((e.target as ServiceWorker).state === 'activated') {
+                  console.log('✅ [SW] Ativado!')
+                  resolve(true)
+                }
+              })
+            })
+          }
+
+          // Forçar reload para que o SW tome controle
+          console.log('🔄 [SW] Recarregando página para ativar controller...')
+          window.location.reload()
+          return
+        }
+
+        console.log('✅ [SW] Controller ativo!')
+        setSwReady(true)
+      } catch (error) {
+        console.error('❌ [SW] Erro ao garantir controle:', error)
+      }
+    }
+
+    ensureServiceWorkerControl()
+  }, [])
 
   useEffect(() => {
     // Só executar no cliente
     if (typeof window === 'undefined') return
+
+    // Aguardar SW estar pronto
+    if (!swReady) return
 
     // Verificar se já pediu permissão nesta sessão
     if (hasAskedPermission) return
@@ -50,7 +100,7 @@ export function NotificationManager() {
     }, 2000)
 
     return () => clearTimeout(timer)
-  }, [hasAskedPermission])
+  }, [hasAskedPermission, swReady])
 
   // Este componente não renderiza nada visualmente
   return null
