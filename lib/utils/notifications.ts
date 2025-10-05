@@ -38,23 +38,31 @@ export async function requestNotificationPermission(): Promise<boolean> {
  * Perfeito para notificar sobre seleções de cardápio
  */
 export async function sendLocalNotification(options: NotificationOptions): Promise<void> {
+  console.log('🔔 [NOTIFICAÇÃO] Tentando enviar notificação:', options.title)
+
   // Verificar se notificações estão disponíveis
   if (!('Notification' in window)) {
-    console.warn('Notificações não suportadas neste navegador')
+    console.error('❌ [NOTIFICAÇÃO] Notificações não suportadas neste navegador')
     return
   }
 
   // Verificar permissão
+  console.log('📋 [NOTIFICAÇÃO] Permissão atual:', Notification.permission)
   if (Notification.permission !== 'granted') {
-    console.warn('Permissão de notificação não concedida')
+    console.error('❌ [NOTIFICAÇÃO] Permissão não concedida')
     return
   }
 
   // Verificar se há service worker registrado
-  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-    // Enviar via service worker (funciona mesmo com app fechado)
-    navigator.serviceWorker.ready.then((registration) => {
-      registration.showNotification(options.title, {
+  if ('serviceWorker' in navigator) {
+    console.log('🔧 [NOTIFICAÇÃO] Service Worker disponível')
+    console.log('🔧 [NOTIFICAÇÃO] Controller:', navigator.serviceWorker.controller ? 'SIM' : 'NÃO')
+
+    try {
+      const registration = await navigator.serviceWorker.ready
+      console.log('✅ [NOTIFICAÇÃO] Service Worker pronto!')
+
+      await registration.showNotification(options.title, {
         body: options.body,
         icon: options.icon || '/icon-192.png',
         badge: options.badge || '/icon-192.png',
@@ -62,9 +70,27 @@ export async function sendLocalNotification(options: NotificationOptions): Promi
         data: options.data,
         vibrate: [200, 100, 200], // Vibração no Android
         requireInteraction: false, // Fecha automaticamente após alguns segundos
+        silent: false, // Não silenciar
       })
-    })
+
+      console.log('🎉 [NOTIFICAÇÃO] Notificação enviada com sucesso!')
+    } catch (error) {
+      console.error('❌ [NOTIFICAÇÃO] Erro ao enviar via Service Worker:', error)
+
+      // Fallback: notificação simples
+      console.log('🔄 [NOTIFICAÇÃO] Tentando fallback...')
+      new Notification(options.title, {
+        body: options.body,
+        icon: options.icon || '/icon-192.png',
+        tag: options.tag || 'menu-selection',
+        data: options.data,
+      })
+      console.log('✅ [NOTIFICAÇÃO] Fallback enviado!')
+    }
   } else {
+    console.error('❌ [NOTIFICAÇÃO] Service Worker não disponível')
+    console.log('🔄 [NOTIFICAÇÃO] Usando notificação simples...')
+
     // Fallback: notificação simples (só funciona com app aberto)
     new Notification(options.title, {
       body: options.body,
@@ -72,6 +98,7 @@ export async function sendLocalNotification(options: NotificationOptions): Promi
       tag: options.tag || 'menu-selection',
       data: options.data,
     })
+    console.log('✅ [NOTIFICAÇÃO] Notificação simples enviada!')
   }
 }
 
