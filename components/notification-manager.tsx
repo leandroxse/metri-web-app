@@ -13,7 +13,11 @@ export function NotificationManager() {
 
   // Garantir que Service Worker está ativo e controlando a página
   useEffect(() => {
-    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+      // Sem service worker, mas pode usar notificações simples
+      setSwReady(true)
+      return
+    }
 
     const ensureServiceWorkerControl = async () => {
       try {
@@ -23,34 +27,17 @@ export function NotificationManager() {
 
         // Verificar se há controller
         if (!navigator.serviceWorker.controller) {
-          console.log('⚠️ [SW] Sem controller - registrando novamente...')
-
-          // Registrar SW se não estiver registrado
-          const reg = await navigator.serviceWorker.register('/sw.js')
-
-          // Aguardar instalação
-          if (reg.installing) {
-            console.log('📥 [SW] Instalando...')
-            await new Promise((resolve) => {
-              reg.installing!.addEventListener('statechange', (e) => {
-                if ((e.target as ServiceWorker).state === 'activated') {
-                  console.log('✅ [SW] Ativado!')
-                  resolve(true)
-                }
-              })
-            })
-          }
-
-          // Forçar reload para que o SW tome controle
-          console.log('🔄 [SW] Recarregando página para ativar controller...')
-          window.location.reload()
-          return
+          console.log('⚠️ [SW] Sem controller - mas notificações funcionarão via fallback')
+          // Não forçar reload - deixar fallback funcionar
+        } else {
+          console.log('✅ [SW] Controller ativo!')
         }
 
-        console.log('✅ [SW] Controller ativo!')
         setSwReady(true)
       } catch (error) {
         console.error('❌ [SW] Erro ao garantir controle:', error)
+        // Mesmo com erro, permitir que notificações via fallback funcionem
+        setSwReady(true)
       }
     }
 
