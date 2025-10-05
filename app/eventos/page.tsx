@@ -563,27 +563,31 @@ export default function EventosPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Team Manager Dialog */}
+        {/* Team Manager Dialog - Otimizado para Desktop/Tablet */}
         <Dialog open={!!managingTeamEvent} onOpenChange={(open) => !open && setManagingTeamEvent(null)}>
-          <DialogContent className="max-w-lg md:max-w-4xl lg:max-w-5xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-primary" />
-                {managingTeamEvent?.title}
+          <DialogContent className="max-w-lg md:max-w-5xl lg:max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="pb-4 border-b">
+              <DialogTitle className="flex items-center gap-3 text-xl">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Calendar className="w-5 h-5 text-primary" />
+                </div>
+                <span>{managingTeamEvent?.title}</span>
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-base mt-2">
                 Gerencie o status e a equipe do evento
               </DialogDescription>
             </DialogHeader>
             {managingTeamEvent && (
-              <TeamManager
-                event={managingTeamEvent}
-                categories={categories}
-                onUpdateEvent={(updatedEvent: Event) => {
-                  updateEvent(updatedEvent.id, updatedEvent)
-                  setManagingTeamEvent(null)
-                }}
-              />
+              <div className="mt-4">
+                <TeamManager
+                  event={managingTeamEvent}
+                  categories={categories}
+                  onUpdateEvent={(updatedEvent: Event) => {
+                    updateEvent(updatedEvent.id, updatedEvent)
+                    setManagingTeamEvent(null)
+                  }}
+                />
+              </div>
             )}
           </DialogContent>
         </Dialog>

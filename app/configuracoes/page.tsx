@@ -31,16 +31,17 @@ export default function ConfiguracoesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-4 py-6 max-w-5xl">
         {/* Header Section */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-heading font-bold text-foreground">Configurações</h1>
-          <p className="text-muted-foreground">Personalize sua experiência no Metri</p>
+        <div className="mb-8">
+          <h1 className="text-3xl font-heading font-bold text-foreground">Configurações</h1>
+          <p className="text-muted-foreground mt-1">Personalize sua experiência no Metri</p>
         </div>
 
-        <div className="space-y-6">
+        {/* Grid Layout para Desktop/Tablet */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Categorias e Equipes */}
-          <Card>
+          <Card className="h-fit">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="w-5 h-5" />
@@ -51,106 +52,14 @@ export default function ConfiguracoesPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => router.push('/categorias')}>
+              <Button onClick={() => router.push('/categorias')} className="w-full">
                 Gerenciar Categorias
               </Button>
             </CardContent>
           </Card>
 
-          {/* Tema */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="w-5 h-5" />
-                Aparência
-              </CardTitle>
-              <CardDescription>
-                Escolha como o aplicativo deve aparecer para você
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Sun className="w-5 h-5 text-orange-500" />
-                  <div>
-                    <p className="font-medium">Tema Claro</p>
-                    <p className="text-sm text-muted-foreground">Interface com fundo claro</p>
-                  </div>
-                </div>
-                <Switch
-                  checked={theme === "light"}
-                  onCheckedChange={() => setTheme("light")}
-                />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Moon className="w-5 h-5 text-blue-500" />
-                  <div>
-                    <p className="font-medium">Tema Escuro</p>
-                    <p className="text-sm text-muted-foreground">Interface com fundo escuro</p>
-                  </div>
-                </div>
-                <Switch
-                  checked={theme === "dark"}
-                  onCheckedChange={() => setTheme("dark")}
-                />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Circle className="w-5 h-5 text-black fill-black" />
-                  <div>
-                    <p className="font-medium">OLED True Black</p>
-                    <p className="text-sm text-muted-foreground">Preto absoluto para telas OLED</p>
-                  </div>
-                </div>
-                <Switch
-                  checked={theme === "oled"}
-                  onCheckedChange={() => setTheme("oled")}
-                />
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Monitor className="w-5 h-5 text-gray-500" />
-                  <div>
-                    <p className="font-medium">Automático</p>
-                    <p className="text-sm text-muted-foreground">Segue o tema do sistema</p>
-                  </div>
-                </div>
-                <Switch
-                  checked={theme === "system"}
-                  onCheckedChange={() => setTheme("system")}
-                />
-              </div>
-
-              <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${
-                    currentTheme === "dark" ? "bg-blue-500" : 
-                    theme === "oled" ? "bg-black" : 
-                    "bg-orange-500"
-                  }`} />
-                  <span className="text-sm font-medium">
-                    Tema atual: {
-                      theme === "oled" ? "OLED True Black" :
-                      currentTheme === "dark" ? "Escuro" : "Claro"
-                    }
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Editor de Cardápio */}
-          <Card>
+          <Card className="h-fit">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ImageIcon className="w-5 h-5" />
@@ -161,9 +70,115 @@ export default function ConfiguracoesPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => router.push('/admin/edit-menu-images')}>
+              <Button onClick={() => router.push('/admin/edit-menu-images')} className="w-full">
                 Abrir Editor
               </Button>
+            </CardContent>
+          </Card>
+
+          {/* Tema - Ocupa toda a largura */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="w-5 h-5" />
+                Aparência
+              </CardTitle>
+              <CardDescription>
+                Escolha como o aplicativo deve aparecer para você
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Grid de opções de tema para desktop */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Tema Claro */}
+                <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+                      <Sun className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Tema Claro</p>
+                      <p className="text-sm text-muted-foreground">Interface com fundo claro</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={theme === "light"}
+                    onCheckedChange={() => setTheme("light")}
+                  />
+                </div>
+
+                {/* Tema Escuro */}
+                <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                      <Moon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Tema Escuro</p>
+                      <p className="text-sm text-muted-foreground">Interface com fundo escuro</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={theme === "dark"}
+                    onCheckedChange={() => setTheme("dark")}
+                  />
+                </div>
+
+                {/* OLED */}
+                <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-900/30">
+                      <Circle className="w-5 h-5 text-black dark:text-white fill-current" />
+                    </div>
+                    <div>
+                      <p className="font-medium">OLED True Black</p>
+                      <p className="text-sm text-muted-foreground">Preto absoluto para telas OLED</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={theme === "oled"}
+                    onCheckedChange={() => setTheme("oled")}
+                  />
+                </div>
+
+                {/* Automático */}
+                <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <Monitor className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Automático</p>
+                      <p className="text-sm text-muted-foreground">Segue o tema do sistema</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={theme === "system"}
+                    onCheckedChange={() => setTheme("system")}
+                  />
+                </div>
+              </div>
+
+              {/* Indicador de Tema Atual */}
+              <div className="mt-6 p-4 bg-primary/10 border-2 border-primary/20 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className={`w-4 h-4 rounded-full ${
+                    currentTheme === "dark" ? "bg-blue-500" :
+                    theme === "oled" ? "bg-black dark:bg-white" :
+                    "bg-orange-500"
+                  }`} />
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Tema Ativo</p>
+                    <p className="font-semibold">
+                      {
+                        theme === "oled" ? "OLED True Black" :
+                        currentTheme === "dark" ? "Escuro" :
+                        theme === "system" ? "Automático" : "Claro"
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
