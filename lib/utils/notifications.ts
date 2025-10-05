@@ -58,40 +58,71 @@ export async function sendLocalNotification(options: NotificationOptions): Promi
     console.log('🔧 [NOTIFICAÇÃO] Service Worker disponível')
     console.log('🔧 [NOTIFICAÇÃO] Controller:', navigator.serviceWorker.controller ? 'SIM' : 'NÃO')
 
-    try {
-      const registration = await navigator.serviceWorker.ready
-      console.log('✅ [NOTIFICAÇÃO] Service Worker pronto!')
+    // Se não tem controller, esperar um pouco e tentar novamente
+    if (!navigator.serviceWorker.controller) {
+      console.log('⏳ [NOTIFICAÇÃO] Aguardando controller ficar disponível...')
 
-      await registration.showNotification(options.title, {
-        body: options.body,
-        icon: options.icon || '/icon-192.png',
-        badge: options.badge || '/icon-192.png',
-        tag: options.tag || 'menu-selection',
-        data: options.data,
-        vibrate: [200, 100, 200], // Vibração no Android
-        requireInteraction: false, // Fecha automaticamente após alguns segundos
-        silent: false, // Não silenciar
+      // Tentar aguardar controller (máximo 3 segundos)
+      const controllerPromise = new Promise<ServiceWorkerRegistration>((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Timeout aguardando controller')), 3000)
+
+        navigator.serviceWorker.ready.then(registration => {
+          clearTimeout(timeout)
+
+          if (navigator.serviceWorker.controller) {
+            console.log('✅ [NOTIFICAÇÃO] Controller ativo!')
+            resolve(registration)
+          } else {
+            reject(new Error('Controller não disponível'))
+          }
+        })
       })
 
-      console.log('🎉 [NOTIFICAÇÃO] Notificação enviada com sucesso!')
-    } catch (error) {
-      console.error('❌ [NOTIFICAÇÃO] Erro ao enviar via Service Worker:', error)
+      try {
+        const registration = await controllerPromise
+        await registration.showNotification(options.title, {
+          body: options.body,
+          icon: options.icon || '/icon-192.png',
+          badge: options.badge || '/icon-192.png',
+          tag: options.tag || 'menu-selection',
+          data: options.data,
+          vibrate: [200, 100, 200],
+          requireInteraction: false,
+          silent: false,
+        })
+        console.log('🎉 [NOTIFICAÇÃO] Notificação enviada com sucesso!')
+        return
+      } catch (error) {
+        console.warn('⚠️ [NOTIFICAÇÃO] Não conseguiu usar SW, usando fallback:', error)
+      }
+    } else {
+      // Controller disponível - usar normalmente
+      try {
+        const registration = await navigator.serviceWorker.ready
+        console.log('✅ [NOTIFICAÇÃO] Service Worker pronto!')
 
-      // Fallback: notificação simples
-      console.log('🔄 [NOTIFICAÇÃO] Tentando fallback...')
-      new Notification(options.title, {
-        body: options.body,
-        icon: options.icon || '/icon-192.png',
-        tag: options.tag || 'menu-selection',
-        data: options.data,
-      })
-      console.log('✅ [NOTIFICAÇÃO] Fallback enviado!')
+        await registration.showNotification(options.title, {
+          body: options.body,
+          icon: options.icon || '/icon-192.png',
+          badge: options.badge || '/icon-192.png',
+          tag: options.tag || 'menu-selection',
+          data: options.data,
+          vibrate: [200, 100, 200],
+          requireInteraction: false,
+          silent: false,
+        })
+
+        console.log('🎉 [NOTIFICAÇÃO] Notificação enviada com sucesso!')
+        return
+      } catch (error) {
+        console.error('❌ [NOTIFICAÇÃO] Erro ao enviar via Service Worker:', error)
+      }
     }
-  } else {
-    console.error('❌ [NOTIFICAÇÃO] Service Worker não disponível')
-    console.log('🔄 [NOTIFICAÇÃO] Usando notificação simples...')
+  }
 
-    // Fallback: notificação simples (só funciona com app aberto)
+  // Fallback: notificação simples (funciona sem service worker)
+  console.log('🔄 [NOTIFICAÇÃO] Usando notificação simples (fallback)...')
+  try {
     new Notification(options.title, {
       body: options.body,
       icon: options.icon || '/icon-192.png',
@@ -99,6 +130,8 @@ export async function sendLocalNotification(options: NotificationOptions): Promi
       data: options.data,
     })
     console.log('✅ [NOTIFICAÇÃO] Notificação simples enviada!')
+  } catch (error) {
+    console.error('❌ [NOTIFICAÇÃO] Erro ao enviar notificação simples:', error)
   }
 }
 
