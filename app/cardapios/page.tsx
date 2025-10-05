@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Plus, Search, Edit, Trash2, Archive, ArchiveRestore, ChefHat, BarChart3, CheckCircle2, FileText } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Archive, ArchiveRestore, ChefHat, BarChart3, CheckCircle2, FileText, Sparkles } from "lucide-react"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { useMenus } from "@/hooks/use-menus"
 import { AnimatedCard } from "@/components/ui/animated-card"
@@ -16,6 +16,7 @@ import { AnimatedContainer } from "@/components/ui/animated-container"
 import { AnimatedNumber } from "@/components/ui/animated-number"
 import { AnimatedIcon } from "@/components/ui/animated-icon"
 import { MenuForm } from "@/components/menu-form"
+import { MenuSummaryDialog } from "@/components/menu-summary-dialog"
 import { Menu } from "@/types/menu"
 
 export default function CardapiosPage() {
@@ -27,6 +28,7 @@ export default function CardapiosPage() {
   const [showArchived, setShowArchived] = useState(false)
   const [archivingMenu, setArchivingMenu] = useState<Menu | null>(null)
   const [deletingMenu, setDeletingMenu] = useState<Menu | null>(null)
+  const [viewingMenu, setViewingMenu] = useState<Menu | null>(null)
 
   const filteredMenus = menus
     .filter(menu => menu.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -114,9 +116,17 @@ export default function CardapiosPage() {
                 {showArchived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
                 {showArchived ? "Ver Ativos" : "Ver Arquivados"}
               </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/cardapios/importar')}
+                className="gap-2"
+              >
+                <Sparkles className="w-4 h-4" />
+                Importar
+              </Button>
               <Button onClick={handleOpenNew} className="gap-2">
                 <Plus className="w-4 h-4" />
-                Novo Cardápio
+                Novo
               </Button>
             </motion.div>
           </div>
@@ -336,7 +346,7 @@ export default function CardapiosPage() {
                 }}
               >
                 <Card className="group hover:shadow-lg transition-all duration-300 border border-border hover:border-primary/30 bg-card">
-                  <CardHeader className="pb-3">
+                  <CardHeader className="pb-3 cursor-pointer" onClick={() => setViewingMenu(menu)}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
@@ -417,6 +427,13 @@ export default function CardapiosPage() {
         onOpenChange={setMenuFormOpen}
         menu={editingMenu}
         onSuccess={handleFormSuccess}
+      />
+
+      {/* Menu Summary Dialog */}
+      <MenuSummaryDialog
+        menu={viewingMenu}
+        open={!!viewingMenu}
+        onOpenChange={(open) => !open && setViewingMenu(null)}
       />
 
       {/* Archive Confirmation Dialog */}

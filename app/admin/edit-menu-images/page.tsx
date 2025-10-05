@@ -35,36 +35,48 @@ function EditMenuContent() {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <Button
-        variant="ghost"
-        onClick={() => router.push('/configuracoes')}
-        className="mb-4"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Voltar
-      </Button>
+    <div className="min-h-screen bg-background">
+      {/* Header compacto fixo */}
+      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push('/configuracoes')}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
 
-      <h1 className="text-2xl font-bold mb-6">Editor de Cardápio</h1>
+            <div className="h-6 w-px bg-border" />
 
-      <div className="mb-6">
-        <Select value={selectedMenuId} onValueChange={setSelectedMenuId}>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecione um cardápio" />
-          </SelectTrigger>
-          <SelectContent>
-            {menus.map(menu => (
-              <SelectItem key={menu.id} value={menu.id}>
-                {menu.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            <h1 className="text-lg font-semibold">Editor de Cardápio</h1>
+
+            <div className="flex-1 max-w-xs ml-auto">
+              <Select value={selectedMenuId} onValueChange={setSelectedMenuId}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="Selecione um cardápio" />
+                </SelectTrigger>
+                <SelectContent>
+                  {menus.map(menu => (
+                    <SelectItem key={menu.id} value={menu.id}>
+                      {menu.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {selectedMenuId && (
-        <MenuEditor menuId={selectedMenuId} onUpdate={loadMenus} />
-      )}
+      {/* Conteúdo */}
+      <div className="container mx-auto px-4 py-6">
+        {selectedMenuId && (
+          <MenuEditor menuId={selectedMenuId} onUpdate={loadMenus} />
+        )}
+      </div>
     </div>
   )
 }

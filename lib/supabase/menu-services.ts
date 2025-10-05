@@ -1,5 +1,6 @@
 import { supabase } from './client'
 import type { Menu, MenuCategory, MenuItem, MenuFormData, MenuCategoryFormData, MenuItemFormData } from '@/types/menu'
+import type { ParsedMenu } from '@/lib/utils/menu-text-parser'
 
 // ============= MENUS =============
 export const menuService = {
@@ -75,6 +76,55 @@ export const menuService = {
     }
 
     return true
+  },
+
+  // Criar cardápio completo a partir de texto parseado
+  async createFromParsedText(parsedData: ParsedMenu): Promise<string | null> {
+    try {
+      // 1. Criar o cardápio
+      const menu = await this.create({
+        name: parsedData.menuName,
+        description: `Importado via texto - ${parsedData.categories.length} categorias`,
+        status: 'active'
+      })
+
+      if (!menu) {
+        throw new Error('Falha ao criar cardápio')
+      }
+
+      // 2. Criar categorias e itens
+      for (let catIndex = 0; catIndex < parsedData.categories.length; catIndex++) {
+        const parsedCategory = parsedData.categories[catIndex]
+
+        const category = await menuCategoryService.create({
+          menu_id: menu.id,
+          name: parsedCategory.name,
+          order_index: catIndex
+        })
+
+        if (!category) {
+          throw new Error(`Falha ao criar categoria: ${parsedCategory.name}`)
+        }
+
+        // 3. Criar itens da categoria
+        for (let itemIndex = 0; itemIndex < parsedCategory.items.length; itemIndex++) {
+          const parsedItem = parsedCategory.items[itemIndex]
+
+          await menuItemService.create({
+            category_id: category.id,
+            name: parsedItem.name,
+            description: parsedItem.description || null,
+            image_url: null,
+            order_index: itemIndex
+          })
+        }
+      }
+
+      return menu.id
+    } catch (error) {
+      console.error('Erro ao criar cardápio completo:', error)
+      throw error
+    }
   }
 }
 
