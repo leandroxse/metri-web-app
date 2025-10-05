@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Geist, Manrope } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
+import { SidebarProvider } from "@/lib/contexts/sidebar-context"
 import { BottomNavigation } from "@/components/bottom-navigation"
 import { ConditionalSidebar } from "@/components/conditional-sidebar"
 import { ConditionalNav } from "@/components/conditional-nav"
@@ -199,19 +200,21 @@ export default function RootLayout({
           disableTransitionOnChange
           themes={['light', 'dark', 'oled', 'system']}
         >
-          {/* Sidebar - Tablet/Desktop apenas (condicional) */}
-          <ConditionalSidebar />
+          <SidebarProvider>
+            {/* Sidebar - Tablet/Desktop apenas (condicional) */}
+            <ConditionalSidebar />
 
-          {/* Main Content - Com padding condicional */}
-          <ConditionalLayoutWrapper>
-            <OfflineBanner />
-            <NotificationManager />
-            <ConditionalMain>
-              {children}
-            </ConditionalMain>
-            <ConditionalNav />
-            <IOSInstallPrompt />
-          </ConditionalLayoutWrapper>
+            {/* Main Content - Com padding condicional */}
+            <ConditionalLayoutWrapper>
+              <OfflineBanner />
+              <NotificationManager />
+              <ConditionalMain>
+                {children}
+              </ConditionalMain>
+              <ConditionalNav />
+              <IOSInstallPrompt />
+            </ConditionalLayoutWrapper>
+          </SidebarProvider>
         </ThemeProvider>
       </body>
     </html>

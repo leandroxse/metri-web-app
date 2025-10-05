@@ -253,7 +253,7 @@ export function SelectionSummary({
   return (
     <>
       {/* Mobile/Tablet - Bottom Sheet */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-sm">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-sm">
         <div className="container-responsive mx-auto px-3 md:px-2.5 py-2 md:py-1.5">
           <div className="relative">
             {/* Logo Marca d'água - Mobile */}
@@ -265,11 +265,11 @@ export function SelectionSummary({
 
             <div className="flex items-center justify-between gap-2 md:gap-2 mb-2 md:mb-1.5 relative z-10">
               <div className="flex items-center gap-2 md:gap-1.5">
-                <Sparkles className="w-5 h-5 md:w-3.5 md:h-3.5 text-primary" />
+                <Sparkles className="w-5 h-5 md:w-3.5 md:h-3.5 text-emerald-600" />
                 <div>
-                  <p className="font-bold text-base md:text-sm leading-tight">{totalSelected} selecionados</p>
+                  <p className="font-bold text-base md:text-sm leading-tight text-gray-900">{totalSelected} selecionados</p>
                   {totalRecommended > 0 && (
-                    <p className="text-xs md:text-[9px] text-muted-foreground leading-tight mt-0.5">Recomendado: {totalRecommended}</p>
+                    <p className="text-xs md:text-[9px] text-gray-600 leading-tight mt-0.5">Recomendado: {totalRecommended}</p>
                   )}
                 </div>
               </div>
@@ -281,27 +281,27 @@ export function SelectionSummary({
                 </SheetTrigger>
                 <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto">
                   <SheetHeader>
-                    <SheetTitle>Suas Seleções</SheetTitle>
+                    <SheetTitle className="text-gray-900">Suas Seleções</SheetTitle>
                   </SheetHeader>
                   <div className="mt-4 space-y-4">
                     {selectedByCategory.length === 0 ? (
-                      <p className="text-center text-muted-foreground py-8">
+                      <p className="text-center text-gray-600 py-8">
                         Nenhum item selecionado ainda
                       </p>
                     ) : (
                       selectedByCategory.map((cat, index) => (
                         <div key={index} className="space-y-2">
                           <div className="flex items-center justify-between">
-                            <h3 className="font-semibold">{cat.name}</h3>
-                            <Badge variant="outline">
+                            <h3 className="font-semibold text-gray-900">{cat.name}</h3>
+                            <Badge variant="outline" className="border-gray-300 text-gray-700">
                               {cat.selected.length}
                               {cat.recommended > 0 && ` / ${cat.recommended}`}
                             </Badge>
                           </div>
                           <ul className="space-y-1 pl-4">
                             {cat.selected.map((item) => (
-                              <li key={item.id} className="text-sm flex items-center gap-2">
-                                <Check className="w-3 h-3 text-primary" />
+                              <li key={item.id} className="text-sm flex items-center gap-2 text-gray-900">
+                                <Check className="w-3 h-3 text-emerald-600" />
                                 {item.name}
                               </li>
                             ))}
@@ -365,7 +365,7 @@ export function SelectionSummary({
       </div>
 
       {/* Desktop/Tablet - Sticky Footer */}
-      <div className="hidden lg:block fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-sm">
+      <div className="hidden lg:block fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-sm">
         <div className="container-responsive mx-auto px-4 py-2 relative">
           {/* Logo Marca d'água - Desktop */}
           <img
@@ -378,20 +378,20 @@ export function SelectionSummary({
             {/* Summary Info */}
             <div className="flex items-center gap-4 ml-20">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
+                <Sparkles className="w-5 h-5 text-emerald-600" />
                 <div>
-                  <div className="text-[10px] text-muted-foreground leading-none">Total Selecionado</div>
-                  <div className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent leading-none mt-1">
+                  <div className="text-[10px] text-gray-600 leading-none">Total Selecionado</div>
+                  <div className="text-xl font-bold text-emerald-600 leading-none mt-1">
                     {totalSelected}
                   </div>
                 </div>
               </div>
               {totalRecommended > 0 && (
                 <>
-                  <div className="h-8 w-px bg-border" />
+                  <div className="h-8 w-px bg-gray-200" />
                   <div>
-                    <div className="text-[10px] text-muted-foreground leading-none">Recomendado</div>
-                    <div className="text-xl font-bold text-primary leading-none mt-1">{totalRecommended}</div>
+                    <div className="text-[10px] text-gray-600 leading-none">Recomendado</div>
+                    <div className="text-xl font-bold text-emerald-600 leading-none mt-1">{totalRecommended}</div>
                   </div>
                 </>
               )}
@@ -421,7 +421,7 @@ export function SelectionSummary({
                 </Button>
               </div>
 
-              <div className="h-7 w-px bg-border" />
+              <div className="h-7 w-px bg-gray-200" />
 
               <Dialog open={isDesktopOpen} onOpenChange={setIsDesktopOpen}>
                 <DialogTrigger asChild>
@@ -437,28 +437,28 @@ export function SelectionSummary({
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle className="text-2xl">Suas Seleções</DialogTitle>
+                    <DialogTitle className="text-2xl text-gray-900">Suas Seleções</DialogTitle>
                   </DialogHeader>
                   <div className="mt-6 space-y-6">
                     {selectedByCategory.length === 0 ? (
-                      <p className="text-center text-muted-foreground py-12">
+                      <p className="text-center text-gray-600 py-12">
                         Nenhum item selecionado ainda
                       </p>
                     ) : (
                       selectedByCategory.map((cat, index) => (
                         <div key={index} className="space-y-3">
-                          <div className="flex items-center justify-between border-b pb-2">
-                            <h3 className="font-bold text-lg">{cat.name}</h3>
-                            <Badge variant="secondary" className="text-sm">
+                          <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                            <h3 className="font-bold text-lg text-gray-900">{cat.name}</h3>
+                            <Badge variant="secondary" className="text-sm bg-gray-100 text-gray-700">
                               {cat.selected.length} selecionado{cat.selected.length !== 1 ? 's' : ''}
                               {cat.recommended > 0 && ` • Recomendado: ${cat.recommended}`}
                             </Badge>
                           </div>
                           <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             {cat.selected.map((item) => (
-                              <li key={item.id} className="text-sm flex items-center gap-2 bg-muted/50 rounded-lg p-2">
-                                <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                                <span>{item.name}</span>
+                              <li key={item.id} className="text-sm flex items-center gap-2 bg-gray-50 rounded-lg p-2">
+                                <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                                <span className="text-gray-900">{item.name}</span>
                               </li>
                             ))}
                           </ul>
@@ -496,30 +496,30 @@ export function SelectionSummary({
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-2xl">
-              <ShoppingBag className="w-6 h-6 text-primary" />
+            <DialogTitle className="flex items-center gap-2 text-2xl text-gray-900">
+              <ShoppingBag className="w-6 h-6 text-emerald-600" />
               Confirmar Seleção
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-6 py-4">
             {/* Resumo Geral */}
-            <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-6 border-2 border-primary/20">
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-lg p-6 border-2 border-emerald-200">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground">Resumo da sua seleção</h3>
-                  <p className="text-sm text-muted-foreground">{eventTitle}</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Resumo da sua seleção</h3>
+                  <p className="text-sm text-gray-600">{eventTitle}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-primary">{totalSelected}</div>
-                  <div className="text-xs text-muted-foreground">itens selecionados</div>
+                  <div className="text-3xl font-bold text-emerald-600">{totalSelected}</div>
+                  <div className="text-xs text-gray-600">itens selecionados</div>
                 </div>
               </div>
 
               {totalRecommended > 0 && (
                 <div className="flex items-center gap-2 text-sm">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  <span className="text-muted-foreground">
+                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                  <span className="text-gray-700">
                     Recomendação do evento: {totalRecommended} itens
                   </span>
                 </div>
@@ -528,21 +528,21 @@ export function SelectionSummary({
 
             {/* Lista de Categorias e Itens */}
             <div className="space-y-4">
-              <h4 className="font-semibold text-lg flex items-center gap-2">
-                <List className="w-5 h-5" />
+              <h4 className="font-semibold text-lg flex items-center gap-2 text-gray-900">
+                <List className="w-5 h-5 text-gray-700" />
                 Itens selecionados por categoria
               </h4>
 
               {selectedByCategory.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-center py-8 text-gray-600">
                   Nenhum item selecionado
                 </div>
               ) : (
                 selectedByCategory.map((cat, index) => (
-                  <div key={index} className="border rounded-lg p-4 bg-card">
-                    <div className="flex items-center justify-between mb-3 pb-2 border-b">
-                      <h5 className="font-semibold text-base">{cat.name}</h5>
-                      <Badge variant="secondary" className="text-sm">
+                  <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white">
+                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
+                      <h5 className="font-semibold text-base text-gray-900">{cat.name}</h5>
+                      <Badge variant="secondary" className="text-sm bg-gray-100 text-gray-700">
                         {cat.selected.length} {cat.selected.length === 1 ? 'item' : 'itens'}
                         {cat.recommended > 0 && ` • Recomendado: ${cat.recommended}`}
                       </Badge>
@@ -550,11 +550,11 @@ export function SelectionSummary({
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {cat.selected.map((item) => (
                         <li key={item.id} className="flex items-start gap-2 text-sm">
-                          <Check className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                          <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                           <div>
-                            <div className="font-medium">{item.name}</div>
+                            <div className="font-medium text-gray-900">{item.name}</div>
                             {item.description && (
-                              <div className="text-xs text-muted-foreground line-clamp-1">
+                              <div className="text-xs text-gray-600 line-clamp-1">
                                 {item.description}
                               </div>
                             )}
@@ -568,16 +568,16 @@ export function SelectionSummary({
             </div>
 
             {/* Mensagem de Confirmação */}
-            <div className="bg-amber-50 dark:bg-amber-950/20 border-2 border-amber-200 dark:border-amber-800 rounded-lg p-4">
+            <div className="bg-amber-50 border-2 border-amber-200 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0">
                   <span className="text-white font-bold text-lg">!</span>
                 </div>
                 <div>
-                  <h5 className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                  <h5 className="font-semibold text-amber-900 mb-1">
                     Tem certeza que deseja finalizar?
                   </h5>
-                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                  <p className="text-sm text-amber-800">
                     Ao confirmar, suas escolhas serão enviadas para o organizador do evento.
                     Você poderá alterar suas seleções posteriormente acessando o mesmo link.
                   </p>

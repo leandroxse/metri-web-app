@@ -216,13 +216,13 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
   }
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 oled:from-black oled:to-gray-900/30 rounded-xl p-6 shadow-sm ring-1 ring-gray-200/50 dark:ring-gray-700/50 oled:ring-gray-600/30 space-y-6">
-      
+    <div className="bg-card rounded-xl p-6 shadow-sm ring-1 ring-border space-y-6">
+
       {/* Status rápido do evento */}
-      <div className="bg-gray-50 dark:bg-gray-800/50 oled:bg-gray-900/70 rounded-lg p-4 mb-4">
+      <div className="bg-muted/50 rounded-lg p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 oled:text-gray-200">Status do Evento:</span>
-          <span className="text-xs text-gray-500 dark:text-gray-400 oled:text-gray-400">Clique para alterar</span>
+          <span className="text-sm font-medium text-foreground">Status do Evento:</span>
+          <span className="text-xs text-muted-foreground">Clique para alterar</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
@@ -240,7 +240,7 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
                   p-2 rounded-lg text-xs font-medium transition-all border-2
                   ${selectedStatus === status.value
                     ? `${config.bgClass} ${config.textClass} border-current`
-                    : 'bg-white dark:bg-gray-700 oled:bg-gray-800/80 text-gray-600 dark:text-gray-400 oled:text-gray-300 border-transparent hover:border-gray-300 dark:hover:border-gray-600 oled:hover:border-gray-500'
+                    : 'bg-background text-muted-foreground border-transparent hover:border-border'
                   }
                 `}
               >
@@ -260,17 +260,17 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
 
       {/* Contrato Vinculado */}
       {linkedContract && (
-        <div className="bg-gray-50 dark:bg-gray-800/50 oled:bg-gray-900/70 rounded-lg p-4 mb-4">
+        <div className="bg-muted/50 rounded-lg p-4 mb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 oled:bg-blue-400/20 rounded-lg flex-shrink-0">
                 <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400 oled:text-blue-300" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 oled:text-gray-400 mb-0.5">
+                <p className="text-xs font-medium text-muted-foreground mb-0.5">
                   Contrato Vinculado
                 </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white oled:text-gray-100 truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {linkedContract.filled_data.Contratante || linkedContract.filled_data.contratante_nome || "Contrato"}
                 </p>
               </div>
@@ -291,9 +291,9 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
 
       {/* Header com informações do evento */}
       <div className="mb-4">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white oled:text-gray-100 mb-2 flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900/30 dark:to-emerald-800/30 oled:from-emerald-400/20 oled:to-emerald-300/20 rounded-lg">
-            <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400 oled:text-emerald-300" />
+        <h2 className="text-xl font-semibold text-foreground mb-2 flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Users className="w-5 h-5 text-primary" />
           </div>
           Equipe do Evento
           {totalSelectedPeople > 0 && (
@@ -302,7 +302,7 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
             </Badge>
           )}
         </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 oled:text-gray-300">
+        <p className="text-sm text-muted-foreground">
           Selecione pessoas em todas as categorias e salve de uma vez
         </p>
       </div>
@@ -310,7 +310,7 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
       {/* No categories message */}
       {(!categories || categories.length === 0) && (
         <div className="text-center py-8">
-          <p className="text-sm text-gray-600 dark:text-gray-400 oled:text-gray-300">
+          <p className="text-sm text-muted-foreground">
             Nenhuma categoria disponível. Por favor, cadastre categorias primeiro.
           </p>
         </div>
@@ -320,7 +320,7 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
       {isLoading && (
         <div className="text-center py-8">
           <div className="animate-spin w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full mx-auto mb-3" />
-          <p className="text-sm text-gray-600 dark:text-gray-400 oled:text-gray-300">
+          <p className="text-sm text-muted-foreground">
             Carregando pessoas...
           </p>
         </div>
@@ -340,7 +340,7 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
                     className="w-4 h-4 rounded-full shadow-sm" 
                     style={{ backgroundColor: category.color }}
                   />
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white oled:text-gray-100">
+                  <h3 className="text-lg font-medium text-foreground">
                     {category.name}
                   </h3>
                   <Badge variant="outline" className="text-xs">
@@ -360,7 +360,7 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
                         className={`group p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer ${
                           isSelected
                             ? 'bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 oled:from-emerald-400/10 oled:to-green-400/10 border-emerald-300 dark:border-emerald-600 oled:border-emerald-400 shadow-md'
-                            : 'bg-white/80 dark:bg-gray-800/80 oled:bg-gray-900/80 border-gray-200 dark:border-gray-700 oled:border-gray-600 hover:border-gray-300 dark:hover:border-gray-600 oled:hover:border-gray-500'
+                            : 'bg-card border-border hover:border-primary/30'
                         } ${
                           hasPendingChange ? 'ring-2 ring-blue-500/30 dark:ring-blue-400/30 oled:ring-blue-400/40' : ''
                         }`}
@@ -376,11 +376,11 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
                               {isSelected && <Check className="w-3 h-3 text-white" />}
                             </div>
                             <div>
-                              <div className="font-medium text-gray-900 dark:text-white oled:text-gray-100">
+                              <div className="font-medium text-foreground">
                                 {person.name}
                               </div>
                               {person.value && (
-                                <div className="text-sm text-gray-600 dark:text-gray-400 oled:text-gray-300">
+                                <div className="text-sm text-muted-foreground">
                                   R$ {person.value.toFixed(2)}
                                 </div>
                               )}
@@ -437,12 +437,12 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
 
       {/* Estado vazio - nenhuma categoria com pessoas */}
       {!isLoading && categoryPeopleData.size === 0 && (
-        <div className="text-center py-12 bg-gray-50/50 dark:bg-gray-800/50 oled:bg-gray-900/50 rounded-xl">
-          <Users className="w-16 h-16 mx-auto mb-4 text-gray-400 dark:text-gray-500 oled:text-gray-400" />
-          <p className="text-gray-600 dark:text-gray-400 oled:text-gray-300 mb-2">
+        <div className="text-center py-12 bg-muted/50 rounded-xl">
+          <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+          <p className="text-muted-foreground mb-2">
             Nenhuma categoria possui pessoas cadastradas
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-500 oled:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Vá em Categorias para adicionar pessoas primeiro
           </p>
         </div>

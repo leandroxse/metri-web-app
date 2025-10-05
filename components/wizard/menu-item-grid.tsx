@@ -26,8 +26,8 @@ interface MenuItemGridProps {
 export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onEditItem }: MenuItemGridProps) {
   if (items.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center text-muted-foreground">
+      <Card className="border-gray-200">
+        <CardContent className="py-12 text-center text-gray-600">
           <p>Nenhum item disponível nesta categoria</p>
         </CardContent>
       </Card>
@@ -44,8 +44,8 @@ export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onEdi
           <Card
             key={item.id}
             className={cn(
-              "cursor-pointer transition-all hover:shadow-md",
-              isSelected && "ring-2 ring-primary bg-primary/5"
+              "cursor-pointer transition-all hover:shadow-md border-gray-200",
+              isSelected && "ring-2 ring-emerald-600 bg-emerald-50"
             )}
             onClick={() => {
               if (adminMode && onEditItem) {
@@ -59,7 +59,7 @@ export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onEdi
               {/* Image */}
               <div className="relative group">
                 {item.image_url ? (
-                  <div className="relative w-full aspect-square md:aspect-[4/3] mb-1.5 md:mb-2 rounded-md overflow-hidden bg-muted">
+                  <div className="relative w-full aspect-square md:aspect-[4/3] mb-1.5 md:mb-2 rounded-md overflow-hidden bg-gray-100">
                     <Image
                       src={item.image_url}
                       alt={item.name}
@@ -68,8 +68,8 @@ export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onEdi
                     />
                   </div>
                 ) : (
-                  <div className="w-full aspect-square md:aspect-[4/3] mb-1.5 md:mb-2 rounded-md bg-muted flex items-center justify-center">
-                    <ImageIcon className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground/50" />
+                  <div className="w-full aspect-square md:aspect-[4/3] mb-1.5 md:mb-2 rounded-md bg-gray-100 flex items-center justify-center">
+                    <ImageIcon className="w-4 h-4 md:w-5 md:h-5 text-gray-400" />
                   </div>
                 )}
 
@@ -84,7 +84,7 @@ export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onEdi
               {/* Content */}
               <div className="space-y-1 md:space-y-1.5">
                 <div className="flex items-start justify-between gap-1.5">
-                  <h3 className="font-semibold text-xs md:text-sm leading-tight flex-1">
+                  <h3 className="font-semibold text-xs md:text-sm leading-tight flex-1 text-gray-900">
                     {item.name}
                   </h3>
                   <Checkbox
@@ -96,7 +96,7 @@ export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onEdi
                 </div>
 
                 {item.description && (
-                  <p className="text-[10px] md:text-xs text-muted-foreground line-clamp-2">
+                  <p className="text-[10px] md:text-xs text-gray-600 line-clamp-2">
                     {item.description}
                   </p>
                 )}

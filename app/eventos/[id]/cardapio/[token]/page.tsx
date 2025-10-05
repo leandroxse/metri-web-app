@@ -217,11 +217,11 @@ export default function MenuWizardPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <Card className="max-w-md w-full bg-white">
+        <Card className="max-w-md w-full bg-white border-gray-200">
           <CardContent className="pt-6 text-center">
-            <AlertCircle className="w-16 h-16 mx-auto text-destructive mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Ops!</h2>
-            <p className="text-muted-foreground">{error}</p>
+            <AlertCircle className="w-16 h-16 mx-auto text-red-500 mb-4" />
+            <h2 className="text-xl font-semibold mb-2 text-gray-900">Ops!</h2>
+            <p className="text-gray-600">{error}</p>
           </CardContent>
         </Card>
       </div>
@@ -231,16 +231,16 @@ export default function MenuWizardPage() {
   if (submitted) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <Card className="max-w-md w-full bg-white">
+        <Card className="max-w-md w-full bg-white border-gray-200">
           <CardContent className="pt-6 text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
               <Check className="w-10 h-10 text-green-600" />
             </div>
-            <h2 className="text-xl font-semibold mb-2">Seleções Enviadas!</h2>
-            <p className="text-muted-foreground mb-4">
+            <h2 className="text-xl font-semibold mb-2 text-gray-900">Seleções Enviadas!</h2>
+            <p className="text-gray-600 mb-4">
               Suas escolhas foram salvas com sucesso.
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-500">
               Você selecionou {selections.size} {selections.size === 1 ? 'item' : 'itens'}.
             </p>
           </CardContent>
@@ -257,20 +257,20 @@ export default function MenuWizardPage() {
   return (
     <div className="min-h-screen bg-white !pb-24 md:!pb-6 !pt-0">
       {/* Unified Header + Progress */}
-      <div className="bg-white border-b sticky top-0 z-30 shadow-sm">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
         <div className="container-responsive mx-auto px-3 md:px-6">
           {/* Desktop: Single Row */}
           <div className="hidden md:flex items-center gap-4 py-2.5">
             {/* Logo + Título */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <ChefHat className="w-4 h-4 text-primary" />
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                <ChefHat className="w-4 h-4 text-emerald-600" />
               </div>
               <div>
-                <h1 className="text-sm font-bold text-foreground leading-tight">
+                <h1 className="text-sm font-bold text-gray-900 leading-tight">
                   {activeCategory.name}
                 </h1>
-                <p className="text-[10px] text-muted-foreground leading-tight">
+                <p className="text-[10px] text-gray-600 leading-tight">
                   {menuData.event.title}
                 </p>
               </div>
@@ -290,17 +290,17 @@ export default function MenuWizardPage() {
                     onClick={() => setActiveCategoryIndex(index)}
                     className={`
                       flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all flex-shrink-0
-                      ${isActive ? 'bg-primary text-primary-foreground shadow-md' :
-                        isSkipped ? 'bg-amber-100 text-amber-700 border border-amber-400/50' :
-                        isPast ? 'bg-green-100 text-green-700' :
-                        'bg-muted text-muted-foreground hover:bg-muted/80'}
+                      ${isActive ? 'bg-emerald-600 text-white shadow-md' :
+                        isSkipped ? 'bg-amber-100 text-amber-800 border border-amber-300' :
+                        isPast ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-700 hover:bg-gray-200'}
                     `}
                   >
                     <div className={`
                       w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold
-                      ${isActive ? 'bg-primary-foreground/20' :
-                        isSkipped ? 'bg-amber-500 text-white' :
-                        isPast ? 'bg-green-600 text-white' : 'bg-background'}
+                      ${isActive ? 'bg-white/20 text-white' :
+                        isSkipped ? 'bg-amber-600 text-white' :
+                        isPast ? 'bg-green-600 text-white' : 'bg-white text-gray-700'}
                     `}>
                       {isPast ? (isSkipped ? '!' : '✓') : index + 1}
                     </div>
@@ -308,7 +308,7 @@ export default function MenuWizardPage() {
                     {selectionCount > 0 && (
                       <span className={`
                         px-1.5 py-0.5 rounded-full text-[10px] font-bold
-                        ${isActive ? 'bg-primary-foreground/20' : 'bg-primary text-primary-foreground'}
+                        ${isActive ? 'bg-white/20 text-white' : 'bg-emerald-600 text-white'}
                       `}>
                         {selectionCount}
                       </span>
@@ -320,7 +320,7 @@ export default function MenuWizardPage() {
 
             {/* Contador Total */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs border-gray-300 text-gray-700">
                 {selections.size} itens
               </Badge>
             </div>
@@ -331,21 +331,21 @@ export default function MenuWizardPage() {
             {/* Row 1: Logo + Categoria Ativa + Contador */}
             <div className="flex items-center justify-between gap-3 py-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <ChefHat className="w-5 h-5 text-primary" />
+                <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
+                  <ChefHat className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h1 className="text-base font-bold text-foreground leading-tight">
+                  <h1 className="text-base font-bold text-gray-900 leading-tight">
                     {activeCategory.name}
                   </h1>
                   {activeCategory.recommended_count > 0 && (
-                    <p className="text-xs text-muted-foreground leading-tight mt-0.5">
+                    <p className="text-xs text-gray-600 leading-tight mt-0.5">
                       Recomendado: {activeCategory.recommended_count}
                     </p>
                   )}
                 </div>
               </div>
-              <Badge variant="outline" className="text-xs px-2.5 py-1">
+              <Badge variant="outline" className="text-xs px-2.5 py-1 border-gray-300 text-gray-700">
                 {selections.size} itens
               </Badge>
             </div>
@@ -364,17 +364,17 @@ export default function MenuWizardPage() {
                     onClick={() => setActiveCategoryIndex(index)}
                     className={`
                       flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all flex-shrink-0
-                      ${isActive ? 'bg-primary text-primary-foreground shadow-md' :
-                        isSkipped ? 'bg-amber-100 text-amber-700 border border-amber-400/50' :
-                        isPast ? 'bg-green-100 text-green-700' :
-                        'bg-muted text-muted-foreground'}
+                      ${isActive ? 'bg-emerald-600 text-white shadow-md' :
+                        isSkipped ? 'bg-amber-100 text-amber-800 border border-amber-300' :
+                        isPast ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-700'}
                     `}
                   >
                     <div className={`
                       w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold
-                      ${isActive ? 'bg-primary-foreground/20' :
-                        isSkipped ? 'bg-amber-500 text-white' :
-                        isPast ? 'bg-green-600 text-white' : 'bg-background'}
+                      ${isActive ? 'bg-white/20 text-white' :
+                        isSkipped ? 'bg-amber-600 text-white' :
+                        isPast ? 'bg-green-600 text-white' : 'bg-white text-gray-700'}
                     `}>
                       {isPast ? (isSkipped ? '!' : '✓') : index + 1}
                     </div>
@@ -382,7 +382,7 @@ export default function MenuWizardPage() {
                     {selectionCount > 0 && (
                       <span className={`
                         px-1.5 py-0.5 rounded-full text-[10px] font-bold
-                        ${isActive ? 'bg-primary-foreground/20' : 'bg-primary text-primary-foreground'}
+                        ${isActive ? 'bg-white/20 text-white' : 'bg-emerald-600 text-white'}
                       `}>
                         {selectionCount}
                       </span>
