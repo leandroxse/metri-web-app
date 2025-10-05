@@ -243,92 +243,141 @@ export default function MenuWizardPage() {
 
   return (
     <div className="min-h-screen bg-background !pb-24 md:!pb-6 !pt-0">
-      {/* Clean Header */}
-      <div className="bg-card border-b sticky top-0 z-30 shadow-sm">
-        <div className="container-responsive mx-auto px-4 py-3 md:py-4 md:px-8">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <ChefHat className="w-5 h-5 text-primary" />
+      {/* Unified Header + Progress */}
+      <div className="bg-white border-b sticky top-0 z-30 shadow-sm">
+        <div className="container-responsive mx-auto px-3 md:px-6">
+          {/* Desktop: Single Row */}
+          <div className="hidden md:flex items-center gap-4 py-2.5">
+            {/* Logo + Título */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <ChefHat className="w-4 h-4 text-primary" />
               </div>
-              <div className="hidden md:block">
-                <h1 className="text-lg md:text-xl font-bold text-foreground">
-                  Monte seu Cardápio
+              <div>
+                <h1 className="text-sm font-bold text-foreground leading-tight">
+                  {activeCategory.name}
                 </h1>
-                <p className="text-xs md:text-sm text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground leading-tight">
                   {menuData.event.title}
                 </p>
               </div>
             </div>
 
-            {/* Título da Categoria - Centralizado */}
-            <div className="flex-1 flex items-center justify-center">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg md:text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                  {activeCategory.name}
-                </h2>
-                {activeCategory.recommended_count > 0 && (
-                  <Badge variant="secondary" className="text-xs md:text-sm">
-                    Recomendado: {activeCategory.recommended_count}
-                  </Badge>
-                )}
-              </div>
+            {/* Progress Pills */}
+            <div className="flex-1 flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+              {menuData.categories.map((cat, index) => {
+                const isActive = index === activeCategoryIndex
+                const isPast = index < activeCategoryIndex
+                const selectionCount = cat.items.filter(item => selections.has(item.id)).length
+                const isSkipped = isPast && selectionCount === 0
+
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategoryIndex(index)}
+                    className={`
+                      flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all flex-shrink-0
+                      ${isActive ? 'bg-primary text-primary-foreground shadow-md' :
+                        isSkipped ? 'bg-amber-100 text-amber-700 border border-amber-400/50' :
+                        isPast ? 'bg-green-100 text-green-700' :
+                        'bg-muted text-muted-foreground hover:bg-muted/80'}
+                    `}
+                  >
+                    <div className={`
+                      w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold
+                      ${isActive ? 'bg-primary-foreground/20' :
+                        isSkipped ? 'bg-amber-500 text-white' :
+                        isPast ? 'bg-green-600 text-white' : 'bg-background'}
+                    `}>
+                      {isPast ? (isSkipped ? '!' : '✓') : index + 1}
+                    </div>
+                    <span className="font-medium text-xs whitespace-nowrap">{cat.name}</span>
+                    {selectionCount > 0 && (
+                      <span className={`
+                        px-1.5 py-0.5 rounded-full text-[10px] font-bold
+                        ${isActive ? 'bg-primary-foreground/20' : 'bg-primary text-primary-foreground'}
+                      `}>
+                        {selectionCount}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
             </div>
 
-            <Badge variant="outline" className="hidden md:flex flex-shrink-0">
-              {menuData.menu.name}
-            </Badge>
+            {/* Contador Total */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Badge variant="outline" className="text-xs">
+                {selections.size} itens
+              </Badge>
+            </div>
           </div>
 
-          {/* Mobile: Event title */}
-          <p className="md:hidden text-xs text-muted-foreground mt-2 text-center">
-            {menuData.event.title}
-          </p>
-        </div>
-      </div>
-
-      {/* Progress Timeline */}
-      <div className="bg-card border-b shadow-sm sticky top-[68px] md:top-[76px] z-20">
-        <div className="container-responsive mx-auto px-4 py-4 md:px-8 lg:px-12">
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {menuData.categories.map((cat, index) => {
-              const isActive = index === activeCategoryIndex
-              const isPast = index < activeCategoryIndex
-              const selectionCount = cat.items.filter(item => selections.has(item.id)).length
-              const isSkipped = isPast && selectionCount === 0
-
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategoryIndex(index)}
-                  className={`
-                    flex items-center gap-2 px-4 py-2 rounded-full transition-all flex-shrink-0
-                    ${isActive ? 'bg-primary text-primary-foreground shadow-lg scale-105' :
-                      isSkipped ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-2 border-amber-400/50' :
-                      isPast ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
-                      'bg-muted text-muted-foreground hover:bg-muted/80'}
-                  `}
-                >
-                  <div className={`
-                    w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold
-                    ${isActive ? 'bg-primary-foreground/20' :
-                      isSkipped ? 'bg-amber-500 text-white' :
-                      isPast ? 'bg-green-600 text-white' : 'bg-background'}
-                  `}>
-                    {isPast ? (isSkipped ? '!' : '✓') : index + 1}
-                  </div>
-                  <span className="font-medium text-sm whitespace-nowrap">{cat.name}</span>
-                  {selectionCount > 0 && (
-                    <span className={`
-                      px-2 py-0.5 rounded-full text-xs font-bold
-                      ${isActive ? 'bg-primary-foreground/20' : 'bg-primary text-primary-foreground'}
-                    `}>
-                      {selectionCount}
-                    </span>
+          {/* Mobile: Two Compact Rows */}
+          <div className="md:hidden">
+            {/* Row 1: Logo + Categoria Ativa + Contador */}
+            <div className="flex items-center justify-between gap-2 py-2">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <ChefHat className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-sm font-bold text-foreground leading-tight">
+                    {activeCategory.name}
+                  </h1>
+                  {activeCategory.recommended_count > 0 && (
+                    <p className="text-[9px] text-muted-foreground leading-tight">
+                      Recomendado: {activeCategory.recommended_count}
+                    </p>
                   )}
-                </button>
-              )
-            })}
+                </div>
+              </div>
+              <Badge variant="outline" className="text-[10px] px-2 py-0.5">
+                {selections.size} itens
+              </Badge>
+            </div>
+
+            {/* Row 2: Progress Pills */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-2 scrollbar-hide">
+              {menuData.categories.map((cat, index) => {
+                const isActive = index === activeCategoryIndex
+                const isPast = index < activeCategoryIndex
+                const selectionCount = cat.items.filter(item => selections.has(item.id)).length
+                const isSkipped = isPast && selectionCount === 0
+
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategoryIndex(index)}
+                    className={`
+                      flex items-center gap-1 px-2 py-1 rounded-full transition-all flex-shrink-0
+                      ${isActive ? 'bg-primary text-primary-foreground shadow-md' :
+                        isSkipped ? 'bg-amber-100 text-amber-700 border border-amber-400/50' :
+                        isPast ? 'bg-green-100 text-green-700' :
+                        'bg-muted text-muted-foreground'}
+                    `}
+                  >
+                    <div className={`
+                      w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold
+                      ${isActive ? 'bg-primary-foreground/20' :
+                        isSkipped ? 'bg-amber-500 text-white' :
+                        isPast ? 'bg-green-600 text-white' : 'bg-background'}
+                    `}>
+                      {isPast ? (isSkipped ? '!' : '✓') : index + 1}
+                    </div>
+                    <span className="font-medium text-[10px] whitespace-nowrap">{cat.name}</span>
+                    {selectionCount > 0 && (
+                      <span className={`
+                        px-1 rounded-full text-[9px] font-bold
+                        ${isActive ? 'bg-primary-foreground/20' : 'bg-primary text-primary-foreground'}
+                      `}>
+                        {selectionCount}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>
