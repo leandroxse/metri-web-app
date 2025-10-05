@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { ChevronUp, Check, ShoppingBag, Download, Share2, Sparkles, List } from "lucide-react"
+import { ChevronUp, Check, ShoppingBag, Download, Share2, Sparkles, List, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Category {
@@ -27,6 +27,10 @@ interface SelectionSummaryProps {
   totalItems: number
   eventTitle?: string
   menuName?: string
+  activeCategoryIndex: number
+  onPrevCategory: () => void
+  onNextCategory: () => void
+  totalCategories: number
 }
 
 export function SelectionSummary({
@@ -35,7 +39,11 @@ export function SelectionSummary({
   onSubmit,
   totalItems,
   eventTitle,
-  menuName
+  menuName,
+  activeCategoryIndex,
+  onPrevCategory,
+  onNextCategory,
+  totalCategories
 }: SelectionSummaryProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [isDesktopOpen, setIsDesktopOpen] = useState(false)
@@ -306,24 +314,49 @@ export function SelectionSummary({
               </Sheet>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 relative z-10">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={exportToPDF}
-                disabled={totalSelected === 0}
-              >
-                <Download className="w-4 h-4 mr-1" />
-                PDF
-              </Button>
-              <Button
-                onClick={() => setIsConfirmOpen(true)}
-                disabled={totalSelected === 0}
-                size="sm"
-              >
-                <Check className="w-4 h-4 mr-1" />
-                Finalizar
-              </Button>
+            <div className="flex items-center gap-2 relative z-10">
+              {/* Navegação */}
+              <div className="flex gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onPrevCategory}
+                  disabled={activeCategoryIndex === 0}
+                  className="h-9 w-9 p-0"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onNextCategory}
+                  disabled={activeCategoryIndex === totalCategories - 1}
+                  className="h-9 w-9 p-0"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+
+              {/* Ações */}
+              <div className="grid grid-cols-2 gap-2 flex-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={exportToPDF}
+                  disabled={totalSelected === 0}
+                >
+                  <Download className="w-4 h-4 mr-1" />
+                  PDF
+                </Button>
+                <Button
+                  onClick={() => setIsConfirmOpen(true)}
+                  disabled={totalSelected === 0}
+                  size="sm"
+                >
+                  <Check className="w-4 h-4 mr-1" />
+                  Finalizar
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -377,6 +410,30 @@ export function SelectionSummary({
 
             {/* Action Buttons */}
             <div className="flex items-center gap-3">
+              {/* Navegação Desktop */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={onPrevCategory}
+                  disabled={activeCategoryIndex === 0}
+                  className="h-10 w-10"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={onNextCategory}
+                  disabled={activeCategoryIndex === totalCategories - 1}
+                  className="h-10 w-10"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </Button>
+              </div>
+
+              <div className="h-10 w-px bg-border" />
+
               <Dialog open={isDesktopOpen} onOpenChange={setIsDesktopOpen}>
                 <DialogTrigger asChild>
                   <Button

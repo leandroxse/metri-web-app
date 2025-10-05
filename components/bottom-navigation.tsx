@@ -7,7 +7,7 @@
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { Home, Calendar, Users, Settings, Download, DollarSign, ChefHat } from "lucide-react"
+import { Home, Calendar, Users, Settings, Download, DollarSign, ChefHat, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 
@@ -74,12 +74,6 @@ export function BottomNavigation() {
       active: pathname === "/eventos"
     },
     {
-      href: "/categorias",
-      icon: Users,
-      label: "Categorias",
-      active: pathname === "/categorias"
-    },
-    {
       href: "/pagamentos",
       icon: DollarSign,
       label: "Pagamentos",
@@ -90,6 +84,12 @@ export function BottomNavigation() {
       icon: ChefHat,
       label: "Cardápios",
       active: pathname === "/cardapios"
+    },
+    {
+      href: "/docs",
+      icon: FileText,
+      label: "Docs",
+      active: pathname.startsWith("/docs")
     },
     {
       href: "/configuracoes",
@@ -126,8 +126,8 @@ export function BottomNavigation() {
         </div>
       )}
 
-      {/* Navegação Inferior */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-md border-t border-border safe-bottom-nav">
+      {/* Navegação Inferior - Apenas Mobile */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-md border-t border-border safe-bottom-nav">
         <div className="flex items-center justify-around py-3 px-4 max-w-md mx-auto">
           {navItems.map((item) => {
             const Icon = item.icon

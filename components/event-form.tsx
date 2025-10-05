@@ -10,9 +10,17 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { DatePickerMobile } from "@/components/ui/date-picker-mobile"
-import { Plus, Minus, Calendar, Clock } from "lucide-react"
+import { Plus, Minus, Calendar, Clock, FileText } from "lucide-react"
 import type { Event } from "@/types/event"
 import type { Category } from "@/types/category"
+import { useContracts } from "@/hooks/use-contracts"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface EventFormProps {
   initialData?: Event
@@ -21,9 +29,12 @@ interface EventFormProps {
 }
 
 export function EventForm({ initialData, onSubmit, categories }: EventFormProps) {
+  // Carregar contratos disponíveis
+  const { contracts, loading: loadingContracts } = useContracts()
+
   // Puxar data atual como padrão
   const today = new Date().toISOString().split('T')[0]
-  
+
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
     description: initialData?.description || "",
@@ -35,7 +46,19 @@ export function EventForm({ initialData, onSubmit, categories }: EventFormProps)
     guestCount: initialData?.guest_count || null,
     pricePerPerson: initialData?.price_per_person || null,
     staffAssignments: initialData?.staffAssignments || [],
+    linkedContractId: null as string | null,
   })
+
+  // Carregar contrato vinculado quando editando
+  useEffect(() => {
+    if (initialData?.id) {
+      // Buscar contrato vinculado a este evento
+      const linkedContract = contracts.find(contract => contract.event_id === initialData.id)
+      if (linkedContract) {
+        setFormData(prev => ({ ...prev, linkedContractId: linkedContract.id }))
+      }
+    }
+  }, [initialData?.id, contracts])
 
   const handleStaffAssignmentChange = (categoryId: string, count: number) => {
     setFormData((prev) => ({
@@ -242,6 +265,63 @@ export function EventForm({ initialData, onSubmit, categories }: EventFormProps)
             rows={3}
             className="resize-none"
           />
+        </div>
+
+        {/* Section divider */}
+        <div className="border-t border-border my-4"></div>
+
+        {/* Header compacto para Contratos */}
+        <div className="mb-4">
+          <h3 className="text-base font-medium text-foreground mb-1 flex items-center gap-2">
+            <FileText className="w-4 h-4 text-primary" />
+            Contrato Vinculado
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Associe um contrato da aba DOCS ao evento
+          </p>
+        </div>
+
+        {/* Contract Selector */}
+        <div className="space-y-2">
+          <Label htmlFor="linkedContract" className="text-sm font-medium">Contrato</Label>
+          <Select
+            value={formData.linkedContractId || "none"}
+            onValueChange={(value) =>
+              setFormData((prev) => ({
+                ...prev,
+                linkedContractId: value === "none" ? null : value
+              }))
+            }
+            disabled={loadingContracts}
+          >
+            <SelectTrigger className="h-10 bg-background border-2 border-input">
+              <SelectValue placeholder={loadingContracts ? "Carregando..." : "Selecione um contrato (opcional)"} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Nenhum contrato</SelectItem>
+              {contracts
+                .filter(contract => !contract.event_id || contract.event_id === initialData?.id)
+                .sort((a, b) => b.created_at.localeCompare(a.created_at))
+                .map((contract) => (
+                  <SelectItem key={contract.id} value={contract.id}>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="default" className="text-xs">
+                        📄
+                      </Badge>
+                      <span className="truncate">
+                        {contract.filled_data.Contratante || contract.filled_data.contratante_nome || "Contrato sem nome"}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            {contracts.length === 0
+              ? "Nenhum contrato disponível. Crie contratos na aba DOCS primeiro."
+              : `${contracts.filter(c => !c.event_id || c.event_id === initialData?.id).length} contrato(s) disponível(is)`
+            }
+          </p>
         </div>
 
         {/* Submit Button */}

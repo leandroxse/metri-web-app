@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 import { Geist, Manrope } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { BottomNavigation } from "@/components/bottom-navigation"
+import { Sidebar } from "@/components/sidebar"
 import { ConditionalNav } from "@/components/conditional-nav"
 import { ConditionalMain } from "@/components/conditional-main"
 import "./globals.css"
@@ -196,7 +197,11 @@ export default function RootLayout({
           disableTransitionOnChange
           themes={['light', 'dark', 'oled', 'system']}
         >
-          <div className="min-h-screen pb-20 pt-safe-or-4 pb-safe-or-20">
+          {/* Sidebar - Tablet/Desktop apenas */}
+          <Sidebar />
+
+          {/* Main Content - Com padding lateral no desktop */}
+          <div className="min-h-screen pb-20 md:pb-0 pt-safe-or-4 md:pl-64">
             <OfflineBanner />
             <ConditionalMain>
               {children}

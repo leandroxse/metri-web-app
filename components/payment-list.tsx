@@ -32,13 +32,15 @@ interface PaymentListProps {
   payments: PersonPayment[]
   onPaymentToggle: (personId: string) => void
   onAmountChange: (personId: string, amount: number) => void
+  pendingToggles?: Set<string>
 }
 
 export function PaymentList({
   selectedEvent,
   payments,
   onPaymentToggle,
-  onAmountChange
+  onAmountChange,
+  pendingToggles = new Set()
 }: PaymentListProps) {
   // Agrupar pessoas por categoria
   const groupByCategory = (eventPayments: PersonPayment[]): CategoryGroup[] => {
@@ -186,14 +188,20 @@ export function PaymentList({
                       }
                     }}
                   >
-                    {group.payments.map((payment) => (
-                      <PaymentCard
-                        key={payment.personId}
-                        payment={payment}
-                        onToggle={() => onPaymentToggle(payment.personId)}
-                        onAmountChange={(amount) => onAmountChange(payment.personId, amount)}
-                      />
-                    ))}
+                    {group.payments.map((payment) => {
+                      const toggleKey = `${selectedEvent}-${payment.personId}`
+                      const isPending = pendingToggles.has(toggleKey)
+
+                      return (
+                        <PaymentCard
+                          key={payment.personId}
+                          payment={payment}
+                          onToggle={() => onPaymentToggle(payment.personId)}
+                          onAmountChange={(amount) => onAmountChange(payment.personId, amount)}
+                          isPending={isPending}
+                        />
+                      )
+                    })}
                   </motion.div>
                 </motion.div>
               ))

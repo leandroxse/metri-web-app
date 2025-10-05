@@ -342,27 +342,6 @@ export default function MenuWizardPage() {
           onToggleItem={handleToggleItem}
         />
 
-        {/* Navigation Buttons */}
-        <div className="flex items-center justify-between mt-8 gap-4">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => setActiveCategoryIndex(Math.max(0, activeCategoryIndex - 1))}
-            disabled={activeCategoryIndex === 0}
-            className="flex-1 md:flex-initial"
-          >
-            ← Anterior
-          </Button>
-          <Button
-            variant="default"
-            size="lg"
-            onClick={() => setActiveCategoryIndex(Math.min(menuData.categories.length - 1, activeCategoryIndex + 1))}
-            disabled={activeCategoryIndex === menuData.categories.length - 1}
-            className="flex-1 md:flex-initial"
-          >
-            Próximo →
-          </Button>
-        </div>
       </main>
 
       {/* Selection Summary - Fixed Bottom */}
@@ -373,6 +352,10 @@ export default function MenuWizardPage() {
         totalItems={menuData.categories.reduce((sum, cat) => sum + cat.items.length, 0)}
         eventTitle={menuData.event.title}
         menuName={menuData.menu.name}
+        activeCategoryIndex={activeCategoryIndex}
+        onPrevCategory={() => setActiveCategoryIndex(Math.max(0, activeCategoryIndex - 1))}
+        onNextCategory={() => setActiveCategoryIndex(Math.min(menuData.categories.length - 1, activeCategoryIndex + 1))}
+        totalCategories={menuData.categories.length}
       />
     </div>
   )

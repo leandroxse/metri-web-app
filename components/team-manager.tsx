@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Users, Check, X, UserPlus, UserMinus, Save } from "lucide-react"
+import { Users, Check, X, Save, FileText, ExternalLink } from "lucide-react"
 import type { Event } from "@/types/event"
 import type { Category, Person } from "@/types/category"
 import { personClientService, eventTeamClientService } from "@/lib/supabase/client-services"
+import { useContracts } from "@/hooks/use-contracts"
 
 interface TeamManagerProps {
   event: Event
@@ -29,6 +30,10 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
   const [hasChanges, setHasChanges] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedStatus, setSelectedStatus] = useState(event.status)
+
+  // Carregar contrato vinculado ao evento
+  const { contracts } = useContracts(event.id)
+  const linkedContract = contracts.find(contract => contract.event_id === event.id)
 
   // Carregar equipe do evento do Supabase
   useEffect(() => {
@@ -282,6 +287,37 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
           })}
         </div>
       </div>
+
+      {/* Contrato Vinculado */}
+      {linkedContract && (
+        <div className="bg-gray-50 dark:bg-gray-800/50 oled:bg-gray-900/70 rounded-lg p-4 mb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 oled:bg-blue-400/20 rounded-lg flex-shrink-0">
+                <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400 oled:text-blue-300" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 oled:text-gray-400 mb-0.5">
+                  Contrato Vinculado
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white oled:text-gray-100 truncate">
+                  {linkedContract.filled_data.Contratante || linkedContract.filled_data.contratante_nome || "Contrato"}
+                </p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => linkedContract.generated_pdf_url && window.open(linkedContract.generated_pdf_url, '_blank')}
+              className="h-8 text-xs flex-shrink-0"
+              disabled={!linkedContract.generated_pdf_url}
+            >
+              <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
+              {linkedContract.generated_pdf_url ? "Abrir" : "Sem PDF"}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Header com informações do evento */}
       <div className="mb-4">

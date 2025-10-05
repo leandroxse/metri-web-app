@@ -4,8 +4,9 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase/client"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, Check } from "lucide-react"
+import { AlertCircle, Check, Download } from "lucide-react"
 
 interface EventMenuSelectionsProps {
   open: boolean
@@ -115,6 +116,203 @@ export function EventMenuSelections({
 
   const totalSelections = categories.reduce((sum, cat) => sum + cat.selectedItems.length, 0)
 
+  const handleExportPDF = () => {
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Seleção de Cardápio - ${eventName}</title>
+          <style>
+            @page { size: A4; margin: 0; }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+              padding: 20px 30px;
+              line-height: 1.3;
+              color: #333;
+              height: 100vh;
+              display: flex;
+              flex-direction: column;
+            }
+            .header {
+              border-bottom: 2px solid #059669;
+              padding-bottom: 10px;
+              margin-bottom: 15px;
+            }
+            h1 {
+              color: #059669;
+              font-size: 22px;
+              margin-bottom: 4px;
+            }
+            .subtitle {
+              color: #666;
+              font-size: 13px;
+              line-height: 1.2;
+            }
+            .summary {
+              background: #f3f4f6;
+              padding: 8px 12px;
+              border-radius: 6px;
+              margin-bottom: 15px;
+              display: flex;
+              gap: 25px;
+            }
+            .summary-item {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            }
+            .summary-label {
+              font-size: 11px;
+              color: #666;
+              text-transform: uppercase;
+            }
+            .summary-value {
+              font-size: 16px;
+              font-weight: bold;
+              color: #059669;
+            }
+            .content {
+              flex: 1;
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+              gap: 12px;
+              margin-bottom: 10px;
+            }
+            .category {
+              break-inside: avoid;
+            }
+            .category-header {
+              background: #059669;
+              color: white;
+              padding: 6px 10px;
+              border-radius: 4px;
+              margin-bottom: 8px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .category-name {
+              font-size: 14px;
+              font-weight: 600;
+            }
+            .category-count {
+              background: rgba(255,255,255,0.25);
+              padding: 2px 8px;
+              border-radius: 10px;
+              font-size: 11px;
+            }
+            .items-list {
+              list-style: none;
+            }
+            .item {
+              padding: 4px 8px;
+              border-left: 2px solid #10b981;
+              margin-bottom: 4px;
+              background: #f9fafb;
+              font-size: 12px;
+            }
+            .item-name {
+              font-weight: 500;
+              color: #111827;
+            }
+            .footer {
+              border-top: 1px solid #e5e7eb;
+              padding-top: 8px;
+              text-align: center;
+              color: #6b7280;
+              font-size: 10px;
+            }
+            @media print {
+              body {
+                padding: 20px 30px;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Seleção de Cardápio</h1>
+            <div class="subtitle">${eventName}${menuName ? ` • ${menuName}` : ''}</div>
+          </div>
+
+          <div class="summary">
+            <div class="summary-item">
+              <span class="summary-label">Total:</span>
+              <span class="summary-value">${totalSelections}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Categorias:</span>
+              <span class="summary-value">${categories.length}</span>
+            </div>
+          </div>
+
+          <div class="content">
+            ${categories.map(cat => `
+              <div class="category">
+                <div class="category-header">
+                  <div class="category-name">${cat.name}</div>
+                  <div class="category-count">
+                    ${cat.selectedItems.length}
+                  </div>
+                </div>
+                <ul class="items-list">
+                  ${cat.selectedItems.map(item => `
+                    <li class="item">
+                      <div class="item-name">✓ ${item.name}</div>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="footer">
+            ${new Date().toLocaleDateString('pt-BR', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
+        </body>
+      </html>
+    `
+
+    printWindow.document.write(html)
+    printWindow.document.close()
+
+    printWindow.onload = () => {
+      printWindow.focus()
+      printWindow.print()
+    }
+  }
+
+  const handleShareWhatsApp = () => {
+    // Gerar texto formatado com as seleções
+    let message = `*Seleção de Cardápio*\n`
+    message += `Evento: ${eventName}\n`
+    if (menuName) message += `Cardápio: ${menuName}\n`
+    message += `\n📊 Total: ${totalSelections} ${totalSelections === 1 ? 'item selecionado' : 'itens selecionados'}\n`
+    message += `\n---\n\n`
+
+    categories.forEach(cat => {
+      message += `*${cat.name}* (${cat.selectedItems.length})\n`
+      cat.selectedItems.forEach((item, index) => {
+        message += `${index + 1}. ${item.name}\n`
+      })
+      message += `\n`
+    })
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -153,6 +351,30 @@ export function EventMenuSelections({
                 <p className="text-xs text-muted-foreground">
                   {totalSelections} {totalSelections === 1 ? 'item selecionado' : 'itens selecionados'}
                 </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportPDF}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Exportar PDF
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleShareWhatsApp}
+                  title="Compartilhar seleções no WhatsApp"
+                  className="text-green-600 hover:bg-green-50 dark:hover:bg-green-950"
+                >
+                  <img
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_mwbHX3hY1L0K0i2JkhhpxGonRGb5WclhTg&s"
+                    alt="WhatsApp"
+                    className="w-5 h-5"
+                  />
+                </Button>
               </div>
             </div>
 

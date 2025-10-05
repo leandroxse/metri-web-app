@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Moon, Sun, Monitor, Palette, Circle, Image as ImageIcon } from "lucide-react"
+import { Moon, Sun, Monitor, Palette, Circle, Image as ImageIcon, Users } from "lucide-react"
 import { useTheme } from "next-themes"
 
 export default function ConfiguracoesPage() {
@@ -39,6 +39,24 @@ export default function ConfiguracoesPage() {
         </div>
 
         <div className="space-y-6">
+          {/* Categorias e Equipes */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Categorias e Equipes
+              </CardTitle>
+              <CardDescription>
+                Gerencie categorias profissionais e colaboradores
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => router.push('/categorias')}>
+                Gerenciar Categorias
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Tema */}
           <Card>
             <CardHeader>

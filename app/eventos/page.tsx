@@ -25,6 +25,7 @@ import type { Event } from "@/types/event"
 import { format, isToday, isTomorrow, isPast } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { isActiveEvent, isHistoryEvent } from "@/lib/utils/event-status"
+import { filledContractService } from "@/lib/supabase/contract-services"
 
 export default function EventosPage() {
   const { events, addEvent, updateEvent, deleteEvent } = useEvents()
@@ -99,14 +100,39 @@ export default function EventosPage() {
       return new Date(a.date + 'T12:00:00').getTime() - new Date(b.date + 'T12:00:00').getTime()
     })
 
-  const handleAddEvent = (eventData: Omit<Event, "id" | "createdAt" | "updatedAt">) => {
-    addEvent(eventData)
+  const handleAddEvent = async (eventData: Omit<Event, "id" | "createdAt" | "updatedAt"> & { linkedContractId?: string | null }) => {
+    const { linkedContractId, ...eventDataWithoutContract } = eventData
+    await addEvent(eventDataWithoutContract)
+
+    // Vincular contrato ao evento se selecionado
+    if (linkedContractId) {
+      // Obter o último evento criado (o que acabamos de adicionar)
+      // Usar timeout curto para garantir que o evento foi criado
+      setTimeout(async () => {
+        const allEvents = await import('@/lib/supabase/client-services').then(m => m.eventClientService.getAll())
+        const latestEvent = allEvents.sort((a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0]
+
+        if (latestEvent) {
+          await filledContractService.update(linkedContractId, { event_id: latestEvent.id })
+        }
+      }, 500)
+    }
+
     setIsAddDialogOpen(false)
   }
 
-  const handleEditEvent = (eventData: Omit<Event, "id" | "createdAt" | "updatedAt">) => {
+  const handleEditEvent = async (eventData: Omit<Event, "id" | "createdAt" | "updatedAt"> & { linkedContractId?: string | null }) => {
     if (editingEvent) {
-      updateEvent(editingEvent.id, eventData)
+      const { linkedContractId, ...eventDataWithoutContract } = eventData
+      await updateEvent(editingEvent.id, eventDataWithoutContract)
+
+      // Atualizar vinculação de contrato
+      if (linkedContractId) {
+        await filledContractService.update(linkedContractId, { event_id: editingEvent.id })
+      }
+
       setEditingEvent(null)
       setIsEditDialogOpen(false)
     }

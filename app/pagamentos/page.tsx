@@ -161,76 +161,152 @@ export default function PagamentosPage() {
     setLocalPayments(new Map(eventPaymentData))
   }, [eventPaymentData])
 
-  // Atualizar valor do pagamento
+  // Atualizar valor do pagamento (usando functional update para prevenir race conditions)
   const handleAmountChange = (eventId: string, personId: string, amount: number) => {
-    const eventPayments = localPayments.get(eventId)
-    if (eventPayments) {
-      const updated = eventPayments.map(p =>
+    setLocalPayments(prevMap => {
+      const prevEventPayments = prevMap.get(eventId)
+      if (!prevEventPayments) return prevMap
+
+      const updated = prevEventPayments.map(p =>
         p.personId === personId ? { ...p, amount } : p
       )
-      const newMap = new Map(localPayments)
+      const newMap = new Map(prevMap)
       newMap.set(eventId, updated)
-      setLocalPayments(newMap)
-    }
+      return newMap
+    })
   }
 
-  // Toggle status de pagamento
+  // Controle de requisições pendentes (evita race conditions em múltiplos toggles simultâneos)
+  const [pendingToggles, setPendingToggles] = useState<Set<string>>(new Set())
+
+  /**
+   * Toggle status de pagamento com Optimistic UI
+   *
+   * IMPORTANTE: Usa functional updates (prevMap => newMap) em vez de updates diretos
+   * para evitar race conditions quando múltiplos toggles acontecem simultaneamente.
+   *
+   * Sem functional update: cada toggle lê o MESMO estado antigo e sobrescreve um ao outro.
+   * Com functional update: cada toggle recebe o estado MAIS RECENTE e aplica mudanças incrementalmente.
+   */
   const handlePaymentToggle = async (eventId: string, personId: string) => {
-    const eventPayments = localPayments.get(eventId)
-    if (!eventPayments) return
+    const toggleKey = `${eventId}-${personId}`
 
-    const payment = eventPayments.find(p => p.personId === personId)
-    if (!payment) return
+    // Bloquear se já há toggle pendente para este item específico
+    if (pendingToggles.has(toggleKey)) {
+      return
+    }
 
-    const newIsPaid = !payment.isPaid
+    // Adicionar à lista de toggles pendentes
+    setPendingToggles(prev => new Set(prev).add(toggleKey))
 
-    const updated = eventPayments.map(p =>
-      p.personId === personId ? { ...p, isPaid: newIsPaid } : p
-    )
-    const newMap = new Map(localPayments)
-    newMap.set(eventId, updated)
-    setLocalPayments(newMap)
+    // Variável para armazenar dados do payment (será atualizada no optimistic update)
+    let paymentData: { paymentId?: string; amount: number; isPaid: boolean } | null = null
+
+    // 1. OPTIMISTIC UPDATE - Atualiza UI IMEDIATAMENTE e captura dados ATUALIZADOS
+    setLocalPayments(prevMap => {
+      const prevEventPayments = prevMap.get(eventId)
+      if (!prevEventPayments) return prevMap
+
+      const currentPayment = prevEventPayments.find(p => p.personId === personId)
+      if (!currentPayment) return prevMap
+
+      const newIsPaid = !currentPayment.isPaid
+
+      // CRÍTICO: Captura dados APÓS atualização (com valor editado pelo usuário)
+      paymentData = {
+        paymentId: currentPayment.paymentId,
+        amount: currentPayment.amount,  // ← Valor EDITADO mais recente
+        isPaid: newIsPaid
+      }
+
+      const updated = prevEventPayments.map(p =>
+        p.personId === personId ? { ...p, isPaid: newIsPaid } : p
+      )
+      const newMap = new Map(prevMap)
+      newMap.set(eventId, updated)
+      return newMap
+    })
+
+    // Se não conseguiu capturar dados, abortar
+    if (!paymentData) {
+      setPendingToggles(prev => {
+        const updated = new Set(prev)
+        updated.delete(toggleKey)
+        return updated
+      })
+      return
+    }
 
     try {
-      if (payment.paymentId) {
-        await updatePayment(payment.paymentId, {
-          is_paid: newIsPaid,
-          amount: payment.amount
+      // 2. BACKEND UPDATE - Usa dados capturados do estado MAIS RECENTE
+      if (paymentData.paymentId) {
+        await updatePayment(paymentData.paymentId, {
+          is_paid: paymentData.isPaid,
+          amount: paymentData.amount  // ← Usa valor EDITADO
         })
       } else {
-        if (payment.amount <= 0) {
+        if (paymentData.amount <= 0) {
+          // Reverter optimistic update usando functional update
+          setLocalPayments(prevMap => {
+            const prevEventPayments = prevMap.get(eventId)
+            if (!prevEventPayments) return prevMap
+
+            const reverted = prevEventPayments.map(p =>
+              p.personId === personId ? { ...p, isPaid: !paymentData!.isPaid } : p
+            )
+            const newMap = new Map(prevMap)
+            newMap.set(eventId, reverted)
+            return newMap
+          })
           alert('Erro: O valor do pagamento deve ser maior que zero.')
-          const reverted = eventPayments.map(p =>
-            p.personId === personId ? { ...p, isPaid: !newIsPaid } : p
-          )
-          newMap.set(eventId, reverted)
-          setLocalPayments(newMap)
           return
         }
 
         const newPayment = await createPayment({
           event_id: eventId,
           person_id: personId,
-          amount: payment.amount,
-          is_paid: newIsPaid
+          amount: paymentData.amount,  // ← Usa valor EDITADO
+          is_paid: paymentData.isPaid
         })
 
         if (newPayment) {
-          const updatedWithId = eventPayments.map(p =>
-            p.personId === personId ? { ...p, isPaid: newIsPaid, paymentId: newPayment.id } : p
-          )
-          newMap.set(eventId, updatedWithId)
-          setLocalPayments(newMap)
+          // Atualizar com ID do payment criado usando functional update
+          setLocalPayments(prevMap => {
+            const prevEventPayments = prevMap.get(eventId)
+            if (!prevEventPayments) return prevMap
+
+            const updatedWithId = prevEventPayments.map(p =>
+              p.personId === personId ? { ...p, isPaid: paymentData!.isPaid, paymentId: newPayment.id } : p
+            )
+            const newMap = new Map(prevMap)
+            newMap.set(eventId, updatedWithId)
+            return newMap
+          })
         }
       }
     } catch (error) {
       console.error('Erro ao atualizar pagamento:', error)
-      const reverted = eventPayments.map(p =>
-        p.personId === personId ? { ...p, isPaid: !newIsPaid } : p
-      )
-      newMap.set(eventId, reverted)
-      setLocalPayments(newMap)
+
+      // 3. REVERT ON ERROR - Usando functional update
+      setLocalPayments(prevMap => {
+        const prevEventPayments = prevMap.get(eventId)
+        if (!prevEventPayments) return prevMap
+
+        const reverted = prevEventPayments.map(p =>
+          p.personId === personId ? { ...p, isPaid: !newIsPaid } : p
+        )
+        const newMap = new Map(prevMap)
+        newMap.set(eventId, reverted)
+        return newMap
+      })
       alert('Erro ao atualizar pagamento. Tente novamente.')
+    } finally {
+      // Remover da lista de toggles pendentes
+      setPendingToggles(prev => {
+        const updated = new Set(prev)
+        updated.delete(toggleKey)
+        return updated
+      })
     }
   }
 
@@ -478,6 +554,7 @@ export default function PagamentosPage() {
               payments={localPayments.get(selectedEvent || '') || []}
               onPaymentToggle={(personId) => selectedEvent && handlePaymentToggle(selectedEvent, personId)}
               onAmountChange={(personId, amount) => selectedEvent && handleAmountChange(selectedEvent, personId, amount)}
+              pendingToggles={pendingToggles}
             />
           </div>
         </motion.div>
