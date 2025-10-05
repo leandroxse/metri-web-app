@@ -36,7 +36,7 @@ export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onEdi
 
   return (
     <>
-    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3">
       {items.map((item) => {
         const isSelected = selections.has(item.id)
 
@@ -55,11 +55,11 @@ export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onEdi
               }
             }}
           >
-            <CardContent className="p-3 md:p-4">
+            <CardContent className="p-2 md:p-2.5">
               {/* Image */}
               <div className="relative group">
                 {item.image_url ? (
-                  <div className="relative w-full aspect-square md:aspect-[4/3] mb-2 md:mb-3 rounded-lg overflow-hidden bg-muted">
+                  <div className="relative w-full aspect-square md:aspect-[4/3] mb-1.5 md:mb-2 rounded-md overflow-hidden bg-muted">
                     <Image
                       src={item.image_url}
                       alt={item.name}
@@ -68,35 +68,35 @@ export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onEdi
                     />
                   </div>
                 ) : (
-                  <div className="w-full aspect-square md:aspect-[4/3] mb-2 md:mb-3 rounded-lg bg-muted flex items-center justify-center">
-                    <ImageIcon className="w-5 h-5 md:w-6 md:h-6 text-muted-foreground/50" />
+                  <div className="w-full aspect-square md:aspect-[4/3] mb-1.5 md:mb-2 rounded-md bg-muted flex items-center justify-center">
+                    <ImageIcon className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground/50" />
                   </div>
                 )}
 
                 {/* Ícone de editar ao passar o mouse (só em adminMode) */}
                 {adminMode && (
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                    <Pencil className="w-8 h-8 text-white" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
+                    <Pencil className="w-6 h-6 md:w-8 md:h-8 text-white" />
                   </div>
                 )}
               </div>
 
               {/* Content */}
-              <div className="space-y-1.5 md:space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-sm md:text-base leading-tight flex-1">
+              <div className="space-y-1 md:space-y-1.5">
+                <div className="flex items-start justify-between gap-1.5">
+                  <h3 className="font-semibold text-xs md:text-sm leading-tight flex-1">
                     {item.name}
                   </h3>
                   <Checkbox
                     checked={isSelected}
                     onCheckedChange={() => onToggleItem(item.id)}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex-shrink-0 mt-0.5 h-4 w-4 md:h-5 md:w-5"
+                    className="flex-shrink-0 mt-0.5 h-3.5 w-3.5 md:h-4 md:w-4"
                   />
                 </div>
 
                 {item.description && (
-                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+                  <p className="text-[10px] md:text-xs text-muted-foreground line-clamp-2">
                     {item.description}
                   </p>
                 )}
