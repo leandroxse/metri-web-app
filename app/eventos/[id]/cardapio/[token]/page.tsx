@@ -313,32 +313,32 @@ export default function MenuWizardPage() {
             </div>
           </div>
 
-          {/* Mobile: Two Compact Rows */}
+          {/* Mobile: Two Rows */}
           <div className="md:hidden">
             {/* Row 1: Logo + Categoria Ativa + Contador */}
-            <div className="flex items-center justify-between gap-2 py-2">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <ChefHat className="w-3.5 h-3.5 text-primary" />
+            <div className="flex items-center justify-between gap-3 py-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <ChefHat className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-sm font-bold text-foreground leading-tight">
+                  <h1 className="text-base font-bold text-foreground leading-tight">
                     {activeCategory.name}
                   </h1>
                   {activeCategory.recommended_count > 0 && (
-                    <p className="text-[9px] text-muted-foreground leading-tight">
+                    <p className="text-xs text-muted-foreground leading-tight mt-0.5">
                       Recomendado: {activeCategory.recommended_count}
                     </p>
                   )}
                 </div>
               </div>
-              <Badge variant="outline" className="text-[10px] px-2 py-0.5">
+              <Badge variant="outline" className="text-xs px-2.5 py-1">
                 {selections.size} itens
               </Badge>
             </div>
 
             {/* Row 2: Progress Pills */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-3 scrollbar-hide">
               {menuData.categories.map((cat, index) => {
                 const isActive = index === activeCategoryIndex
                 const isPast = index < activeCategoryIndex
@@ -350,7 +350,7 @@ export default function MenuWizardPage() {
                     key={cat.id}
                     onClick={() => setActiveCategoryIndex(index)}
                     className={`
-                      flex items-center gap-1 px-2 py-1 rounded-full transition-all flex-shrink-0
+                      flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all flex-shrink-0
                       ${isActive ? 'bg-primary text-primary-foreground shadow-md' :
                         isSkipped ? 'bg-amber-100 text-amber-700 border border-amber-400/50' :
                         isPast ? 'bg-green-100 text-green-700' :
@@ -358,17 +358,17 @@ export default function MenuWizardPage() {
                     `}
                   >
                     <div className={`
-                      w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold
+                      w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold
                       ${isActive ? 'bg-primary-foreground/20' :
                         isSkipped ? 'bg-amber-500 text-white' :
                         isPast ? 'bg-green-600 text-white' : 'bg-background'}
                     `}>
                       {isPast ? (isSkipped ? '!' : '✓') : index + 1}
                     </div>
-                    <span className="font-medium text-[10px] whitespace-nowrap">{cat.name}</span>
+                    <span className="font-medium text-xs whitespace-nowrap">{cat.name}</span>
                     {selectionCount > 0 && (
                       <span className={`
-                        px-1 rounded-full text-[9px] font-bold
+                        px-1.5 py-0.5 rounded-full text-[10px] font-bold
                         ${isActive ? 'bg-primary-foreground/20' : 'bg-primary text-primary-foreground'}
                       `}>
                         {selectionCount}
