@@ -50,7 +50,7 @@ export function PaymentCard({ payment, onToggle, onAmountChange, isPending = fal
         transition: { duration: 0.1 }
       }}
     >
-      <div className="flex items-center gap-3 flex-1 min-w-0 pointer-events-none">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
         <motion.div
           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
             payment.isPaid

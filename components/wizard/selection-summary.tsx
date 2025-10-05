@@ -254,29 +254,29 @@ export function SelectionSummary({
     <>
       {/* Mobile/Tablet - Bottom Sheet */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-background via-background to-transparent backdrop-blur-sm">
-        <div className="container-responsive mx-auto px-4 py-4">
-          <div className="bg-card rounded-2xl shadow-2xl border-2 border-primary/20 p-4 relative overflow-hidden">
+        <div className="container-responsive mx-auto px-3 md:px-4 py-2 md:py-3">
+          <div className="bg-card rounded-xl md:rounded-2xl shadow-2xl border-2 border-primary/20 p-2.5 md:p-3 relative overflow-hidden">
             {/* Logo Marca d'água - Mobile */}
             <img
               src="/prime-logo.png"
               alt="Prime Buffet"
-              className="absolute right-2 bottom-2 h-8 w-auto opacity-10 pointer-events-none"
+              className="absolute right-1.5 bottom-1.5 md:right-2 md:bottom-2 h-6 md:h-8 w-auto opacity-10 pointer-events-none"
             />
 
-            <div className="flex items-center justify-between gap-3 mb-3 relative z-10">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
+            <div className="flex items-center justify-between gap-2 md:gap-3 mb-2 md:mb-3 relative z-10">
+              <div className="flex items-center gap-1.5 md:gap-2">
+                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                 <div>
-                  <p className="font-bold text-lg">{totalSelected} selecionados</p>
+                  <p className="font-bold text-base md:text-lg">{totalSelected} selecionados</p>
                   {totalRecommended > 0 && (
-                    <p className="text-xs text-muted-foreground">Recomendado: {totalRecommended}</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground">Recomendado: {totalRecommended}</p>
                   )}
                 </div>
               </div>
               <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    Ver Todos <ChevronUp className="w-4 h-4 ml-1" />
+                  <Button variant="outline" size="sm" className="h-8 md:h-9 text-xs md:text-sm">
+                    Ver Todos <ChevronUp className="w-3 h-3 md:w-4 md:h-4 ml-1" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto">
@@ -314,7 +314,7 @@ export function SelectionSummary({
               </Sheet>
             </div>
 
-            <div className="flex items-center gap-2 relative z-10">
+            <div className="flex items-center gap-1.5 md:gap-2 relative z-10">
               {/* Navegação */}
               <div className="flex gap-1">
                 <Button
@@ -322,38 +322,40 @@ export function SelectionSummary({
                   size="sm"
                   onClick={onPrevCategory}
                   disabled={activeCategoryIndex === 0}
-                  className="h-9 w-9 p-0"
+                  className="h-7 w-7 md:h-9 md:w-9 p-0"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={onNextCategory}
                   disabled={activeCategoryIndex === totalCategories - 1}
-                  className="h-9 w-9 p-0"
+                  className="h-7 w-7 md:h-9 md:w-9 p-0"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
                 </Button>
               </div>
 
               {/* Ações */}
-              <div className="grid grid-cols-2 gap-2 flex-1">
+              <div className="grid grid-cols-2 gap-1.5 md:gap-2 flex-1">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={exportToPDF}
                   disabled={totalSelected === 0}
+                  className="h-7 md:h-9 text-xs md:text-sm"
                 >
-                  <Download className="w-4 h-4 mr-1" />
+                  <Download className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                   PDF
                 </Button>
                 <Button
                   onClick={() => setIsConfirmOpen(true)}
                   disabled={totalSelected === 0}
                   size="sm"
+                  className="h-7 md:h-9 text-xs md:text-sm"
                 >
-                  <Check className="w-4 h-4 mr-1" />
+                  <Check className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                   Finalizar
                 </Button>
               </div>

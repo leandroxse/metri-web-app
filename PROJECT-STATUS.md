@@ -118,10 +118,14 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 - ✅ Suspense boundary para Next.js 15
 - ✅ Sidebar moderna para Tablet/Desktop
 - ✅ Bottom navigation apenas para Mobile/PWA
-- ✅ Optimistic UI em pagamentos (sem glitches visuais)
+- ✅ **Optimistic UI em pagamentos** (salvamento em background, resposta instantânea)
 - ✅ Valores editados mantidos ao marcar como pago
 - ✅ Card inteiro clicável para marcar/desmarcar pagamento
 - ✅ Sistema de vinculação contrato-evento (contratos ao invés de documentos gerais)
+
+### Performance
+- ✅ **Fire-and-forget pattern** para pagamentos (UI não bloqueia durante salvamento)
+- ✅ Salvamento assíncrono no Supabase com auto-revert em caso de erro
 
 ## 📁 Estrutura Atualizada
 

@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Plus, Edit, Trash2, GripVertical } from "lucide-react"
+import { Plus, Edit, Trash2, GripVertical, ImageIcon, Image as ImageIconLucide, Clipboard } from "lucide-react"
 import { MenuItemGrid } from "@/components/wizard/menu-item-grid"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import Image from "next/image"
 
 interface MenuEditorProps {
   menuId: string
@@ -41,6 +42,7 @@ export function MenuEditor({ menuId, onUpdate }: MenuEditorProps) {
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
   const [itemName, setItemName] = useState("")
   const [itemDescription, setItemDescription] = useState("")
+  const [itemImageUrl, setItemImageUrl] = useState("")
 
   // Estados para exclusão
   const [deletingCategory, setDeletingCategory] = useState<any>(null)
@@ -94,15 +96,6 @@ export function MenuEditor({ menuId, onUpdate }: MenuEditorProps) {
       loadMenu()
       onUpdate?.()
     }
-  }
-
-  const handleImageChange = (itemId: string, imageUrl: string) => {
-    setCategories(prev => prev.map(cat => ({
-      ...cat,
-      items: cat.items.map(item =>
-        item.id === itemId ? { ...item, image_url: imageUrl } : item
-      )
-    })))
   }
 
   const handleAddCategory = async () => {
@@ -200,7 +193,8 @@ export function MenuEditor({ menuId, onUpdate }: MenuEditorProps) {
       .from('menu_items')
       .update({
         name: itemName,
-        description: itemDescription
+        description: itemDescription,
+        image_url: itemImageUrl
       })
       .eq('id', editingItemId)
 
@@ -209,7 +203,7 @@ export function MenuEditor({ menuId, onUpdate }: MenuEditorProps) {
         ...cat,
         items: cat.items.map(item =>
           item.id === editingItemId
-            ? { ...item, name: itemName, description: itemDescription }
+            ? { ...item, name: itemName, description: itemDescription, image_url: itemImageUrl }
             : item
         )
       })))
@@ -217,6 +211,7 @@ export function MenuEditor({ menuId, onUpdate }: MenuEditorProps) {
       setEditingItemId(null)
       setItemName("")
       setItemDescription("")
+      setItemImageUrl("")
     }
   }
 
@@ -248,6 +243,7 @@ export function MenuEditor({ menuId, onUpdate }: MenuEditorProps) {
     setEditingItemId(item.id)
     setItemName(item.name)
     setItemDescription(item.description || "")
+    setItemImageUrl(item.image_url || "")
     setIsEditingItem(true)
   }
 
@@ -345,9 +341,7 @@ export function MenuEditor({ menuId, onUpdate }: MenuEditorProps) {
                   selections={selections}
                   onToggleItem={() => {}}
                   adminMode={true}
-                  onImageChange={handleImageChange}
                   onEditItem={openEditItem}
-                  onDeleteItem={setDeletingItem}
                 />
               </div>
             )}
@@ -451,9 +445,10 @@ export function MenuEditor({ menuId, onUpdate }: MenuEditorProps) {
           setIsEditingItem(false)
           setItemName("")
           setItemDescription("")
+          setItemImageUrl("")
         }
       }}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
               {isEditingItem ? "Editar Item" : "Adicionar Item"}
@@ -477,21 +472,120 @@ export function MenuEditor({ menuId, onUpdate }: MenuEditorProps) {
                 rows={3}
               />
             </div>
-            <div className="flex gap-2 justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsAddingItem(false)
-                  setIsEditingItem(false)
-                  setItemName("")
-                  setItemDescription("")
+
+            {/* Área para Colar Imagem */}
+            <div>
+              <Label>Imagem do Prato</Label>
+              <div
+                className="mt-2 border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
+                onPaste={async (e) => {
+                  const items = e.clipboardData?.items
+                  if (!items) return
+
+                  for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                      const blob = items[i].getAsFile()
+                      if (blob) {
+                        const reader = new FileReader()
+                        reader.onload = (event) => {
+                          const base64 = event.target?.result as string
+                          setItemImageUrl(base64)
+                        }
+                        reader.readAsDataURL(blob)
+                      }
+                    }
+                  }
                 }}
+                tabIndex={0}
               >
-                Cancelar
-              </Button>
-              <Button onClick={isEditingItem ? handleEditItem : handleAddItem}>
-                {isEditingItem ? "Salvar" : "Adicionar"}
-              </Button>
+                {itemImageUrl ? (
+                  <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted mb-3">
+                    <Image
+                      src={itemImageUrl}
+                      alt={itemName || "Preview"}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <Clipboard className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                )}
+
+                <p className="text-sm font-medium mb-1">
+                  {itemImageUrl ? "✓ Imagem adicionada!" : "Clique aqui e pressione Ctrl+V"}
+                </p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  ou
+                </p>
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const clipboardItems = await navigator.clipboard.read()
+                      for (const item of clipboardItems) {
+                        for (const type of item.types) {
+                          if (type.startsWith('image/')) {
+                            const blob = await item.getType(type)
+                            const reader = new FileReader()
+                            reader.onload = (event) => {
+                              const base64 = event.target?.result as string
+                              setItemImageUrl(base64)
+                            }
+                            reader.readAsDataURL(blob)
+                            return
+                          }
+                        }
+                      }
+                      alert('Nenhuma imagem encontrada na área de transferência')
+                    } catch (error) {
+                      alert('Erro ao acessar área de transferência. Use Ctrl+V ou copie uma imagem primeiro.')
+                    }
+                  }}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Clipboard className="w-4 h-4 mr-2" />
+                  Colar da Área de Transferência
+                </Button>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-between">
+              <div>
+                {isEditingItem && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      const currentItem = categories
+                        .flatMap(cat => cat.items)
+                        .find(item => item.id === editingItemId)
+                      if (currentItem) {
+                        setDeletingItem(currentItem)
+                        setIsEditingItem(false)
+                      }
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Excluir Item
+                  </Button>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddingItem(false)
+                    setIsEditingItem(false)
+                    setItemName("")
+                    setItemDescription("")
+                    setItemImageUrl("")
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button onClick={isEditingItem ? handleEditItem : handleAddItem}>
+                  {isEditingItem ? "Salvar" : "Adicionar"}
+                </Button>
+              </div>
             </div>
           </div>
         </DialogContent>

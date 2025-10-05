@@ -1,14 +1,10 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Button } from "@/components/ui/button"
-import { ImageIcon, Search, Pencil, Trash2 } from "lucide-react"
+import { ImageIcon, Pencil } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
-import { ImageSearchModal } from "@/components/image-search-modal"
-import { supabase } from "@/lib/supabase/client"
 
 interface MenuItem {
   id: string
@@ -27,11 +23,7 @@ interface MenuItemGridProps {
   onDeleteItem?: (item: MenuItem) => void
 }
 
-export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onImageChange, onEditItem, onDeleteItem }: MenuItemGridProps) {
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
-
-  const selectedItem = items.find(i => i.id === selectedItemId)
+export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onEditItem }: MenuItemGridProps) {
   if (items.length === 0) {
     return (
       <Card>
@@ -55,7 +47,13 @@ export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onIma
               "cursor-pointer transition-all hover:shadow-md",
               isSelected && "ring-2 ring-primary bg-primary/5"
             )}
-            onClick={() => onToggleItem(item.id)}
+            onClick={() => {
+              if (adminMode && onEditItem) {
+                onEditItem(item)
+              } else {
+                onToggleItem(item.id)
+              }
+            }}
           >
             <CardContent className="p-3 md:p-4">
               {/* Image */}
@@ -75,50 +73,10 @@ export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onIma
                   </div>
                 )}
 
-                {/* Admin: Action Buttons */}
+                {/* Ícone de editar ao passar o mouse (só em adminMode) */}
                 {adminMode && (
-                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="h-7 w-7 p-0"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setSelectedItemId(item.id)
-                        setSearchOpen(true)
-                      }}
-                      title="Buscar imagem"
-                    >
-                      <Search className="w-3.5 h-3.5" />
-                    </Button>
-                    {onEditItem && (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="h-7 w-7 p-0"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onEditItem(item)
-                        }}
-                        title="Editar item"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </Button>
-                    )}
-                    {onDeleteItem && (
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        className="h-7 w-7 p-0"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onDeleteItem(item)
-                        }}
-                        title="Excluir item"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    )}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                    <Pencil className="w-8 h-8 text-white" />
                   </div>
                 )}
               </div>
@@ -148,26 +106,6 @@ export function MenuItemGrid({ items, selections, onToggleItem, adminMode, onIma
         )
       })}
     </div>
-
-    {/* Admin: Image Search Modal */}
-    {adminMode && selectedItem && (
-      <ImageSearchModal
-        open={searchOpen}
-        onClose={() => setSearchOpen(false)}
-        itemName={selectedItem.name}
-        onSelect={async (imageUrl) => {
-          // Salvar URL direto (sem upload)
-          const { error } = await supabase
-            .from('menu_items')
-            .update({ image_url: imageUrl })
-            .eq('id', selectedItemId)
-
-          if (!error && onImageChange) {
-            onImageChange(selectedItemId!, imageUrl)
-          }
-        }}
-      />
-    )}
   </>
   )
 }

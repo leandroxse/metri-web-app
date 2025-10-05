@@ -18,14 +18,13 @@ export function usePayments(eventId?: string) {
     try {
       setLoading(true)
       setError(null)
-      // Se há eventId específico, buscar por evento, senão buscar todos
-      const data = eventId 
+      const data = eventId
         ? await paymentClientService.getByEvent(eventId)
         : await paymentClientService.getAll()
       setPayments(data)
     } catch (err) {
       setError('Erro ao carregar pagamentos')
-      console.error('Erro ao carregar pagamentos:', err)
+      console.error('❌ [usePayments] Erro ao carregar pagamentos:', err)
     } finally {
       setLoading(false)
     }
@@ -48,21 +47,28 @@ export function usePayments(eventId?: string) {
   }
 
   // Atualizar pagamento
-  const updatePayment = async (id: string, updates: { amount?: number; isPaid?: boolean }) => {
+  const updatePayment = async (id: string, updates: { amount?: number; is_paid?: boolean; isPaid?: boolean }) => {
     try {
-      const updatedPayment = await paymentClientService.update(id, updates)
+      // Converter isPaid (camelCase) para is_paid (snake_case) se necessário
+      const normalizedUpdates = {
+        ...updates,
+        is_paid: updates.is_paid ?? updates.isPaid
+      }
+      delete (normalizedUpdates as any).isPaid
+
+      const updatedPayment = await paymentClientService.update(id, normalizedUpdates)
+
       if (updatedPayment) {
-        setPayments(prev => 
-          prev.map(payment => 
-            payment.id === id ? updatedPayment : payment
-          )
-        )
+        setPayments(prev => prev.map(payment =>
+          payment.id === id ? updatedPayment : payment
+        ))
         return updatedPayment
       }
+
       return null
     } catch (err) {
       setError('Erro ao atualizar pagamento')
-      console.error('Erro ao atualizar pagamento:', err)
+      console.error('❌ [usePayments] Erro ao atualizar pagamento:', err)
       return null
     }
   }
