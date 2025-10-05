@@ -11,6 +11,7 @@ import { ChefHat, Calendar, AlertCircle, Check } from "lucide-react"
 import { CategoryStepper } from "@/components/wizard/category-stepper"
 import { MenuItemGrid } from "@/components/wizard/menu-item-grid"
 import { SelectionSummary } from "@/components/wizard/selection-summary"
+import { notifyMenuSelectionCompleted } from "@/lib/utils/notifications"
 
 interface MenuData {
   menu: {
@@ -155,7 +156,7 @@ export default function MenuWizardPage() {
   }
 
   const handleSubmit = async () => {
-    if (!eventMenuId) return
+    if (!eventMenuId || !menuData) return
 
     try {
       // 1. Deletar seleções antigas
@@ -177,6 +178,18 @@ export default function MenuWizardPage() {
       }
 
       setSubmitted(true)
+
+      // 🔔 ENVIAR NOTIFICAÇÃO - Convidado finalizou seleção
+      try {
+        await notifyMenuSelectionCompleted(
+          menuData.event.title,
+          undefined, // Nome do convidado (pode adicionar input depois)
+          selections.size
+        )
+      } catch (notificationError) {
+        // Não bloquear o fluxo se notificação falhar
+        console.log('Notificação não enviada:', notificationError)
+      }
     } catch (error) {
       console.error('Erro ao salvar seleções:', error)
       alert('Erro ao salvar suas escolhas. Tente novamente.')

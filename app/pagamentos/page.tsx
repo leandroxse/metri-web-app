@@ -79,6 +79,23 @@ export default function PagamentosPage() {
 
   // Estado para dados de pagamento processados
   const [eventPaymentData, setEventPaymentData] = useState<Map<string, PersonPayment[]>>(new Map())
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  // 🔄 REVALIDAÇÃO AO TROCAR DE ABA - Atualiza quando volta para a página
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Aba ficou visível - recarregar dados
+        setRefreshTrigger(prev => prev + 1)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
 
   // Processar eventos e pessoas para criar estrutura de pagamentos
   useEffect(() => {
@@ -108,7 +125,7 @@ export default function PagamentosPage() {
                   categoryName: category.name,
                   categoryColor: category.color,
                   eventId: event.id,
-                  amount: person.value || 50,
+                  amount: existingPayment?.amount || person.value || 50,
                   isPaid: existingPayment?.is_paid || false,
                   paymentId: existingPayment?.id
                 }
@@ -155,13 +172,13 @@ export default function PagamentosPage() {
     if (relevantEvents.length > 0 && categories.length > 0) {
       loadEventPaymentData()
     }
-  }, [relevantEvents, categories, payments])
+  }, [relevantEvents, categories, payments, people, refreshTrigger])
 
   useEffect(() => {
     setLocalPayments(new Map(eventPaymentData))
   }, [eventPaymentData])
 
-  // Atualizar valor do pagamento (usando functional update para prevenir race conditions)
+  // Atualizar valor do pagamento
   const handleAmountChange = (eventId: string, personId: string, amount: number) => {
     setLocalPayments(prevMap => {
       const prevEventPayments = prevMap.get(eventId)
@@ -314,7 +331,9 @@ export default function PagamentosPage() {
         event_id: eventId,
         person_id: personId,
         amount: paymentData.amount,
-        is_paid: paymentData.isPaid
+        is_paid: paymentData.isPaid,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }).then(newPayment => {
         if (newPayment) {
           // Atualizar com ID do payment criado

@@ -113,84 +113,54 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
 
   // Toggle seleção de pessoa individual
   const togglePersonSelection = (person: Person) => {
-    console.log(`🔄 Toggle pessoa: ${person.name}`)
-    
     const newPending = new Set(pendingSelections)
-    const isCurrentlyInTeam = eventTeam.some(p => p.id === person.id)
-    const currentlySelected = isPersonSelected(person)
-    
-    console.log(`📊 Estado antes do toggle:`, {
-      personName: person.name,
-      isCurrentlyInTeam,
-      currentlySelected,
-      hadPendingChange: pendingSelections.has(person.id)
-    })
-    
+
     if (newPending.has(person.id)) {
       newPending.delete(person.id)
-      console.log(`🗑️ Removendo ${person.name} das mudanças pendentes`)
     } else {
       newPending.add(person.id)
-      console.log(`➕ Adicionando ${person.name} às mudanças pendentes`)
     }
-    
+
     setPendingSelections(newPending)
     setHasChanges(true)
-    
-    // Estado após mudança
-    const willBeSelected = newPending.has(person.id) ? !isCurrentlyInTeam : isCurrentlyInTeam
-    console.log(`🎯 ${person.name} ficará: ${willBeSelected ? 'SELECIONADA' : 'NÃO SELECIONADA'}`)
   }
 
   // Aplicar todas as alterações
   const saveAllChanges = async () => {
-    console.log('💾 Salvando alterações da equipe...')
-    console.log('📋 Estado atual da equipe:', eventTeam.map(p => p.name))
-    console.log('🔄 Mudanças pendentes:', Array.from(pendingSelections))
-    
     // CORREÇÃO: Usar isPersonSelected que já tem a lógica correta
     const updatedTeam: Person[] = []
-    
+
     // Para cada categoria, incluir apenas as pessoas que devem estar selecionadas
     categoryPeopleData.forEach(({ people }) => {
       people.forEach(person => {
         const shouldBeInTeam = isPersonSelected(person)
-        
+
         if (shouldBeInTeam) {
           updatedTeam.push(person)
-          console.log(`✅ Incluindo na equipe: ${person.name}`)
-        } else {
-          console.log(`❌ Removendo da equipe: ${person.name}`)
         }
       })
     })
 
-    console.log('🎯 Nova equipe final:', updatedTeam.map(p => p.name))
-
     // Salvar no Supabase e atualizar estado
     try {
-      console.log('🏆 Saving team to Supabase...')
       const personIds = updatedTeam.map(person => person.id)
       const success = await eventTeamClientService.saveEventTeam(event.id, personIds)
-      
+
       if (success) {
-        console.log('✅ Team saved to Supabase successfully!')
         setEventTeam(updatedTeam)
         updateEventStaffAssignments(updatedTeam)
-        
+
         // Reset pending selections
         setPendingSelections(new Set())
         setHasChanges(false)
       } else {
-        console.error('❌ Failed to save team to Supabase')
+        console.error('Erro ao salvar equipe no Supabase')
         alert('Erro ao salvar equipe. Tente novamente.')
       }
     } catch (error) {
-      console.error('❌ Error saving team to Supabase:', error)
+      console.error('Erro ao salvar equipe:', error)
       alert('Erro ao salvar equipe. Verifique sua conexão e tente novamente.')
     }
-    
-    console.log('✅ Alterações salvas com sucesso!')
   }
 
   // Cancelar alterações

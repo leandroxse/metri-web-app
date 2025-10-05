@@ -10,6 +10,7 @@ import { ConditionalLayoutWrapper } from "@/components/conditional-layout-wrappe
 import "./globals.css"
 import { OfflineBanner } from "@/components/offline-banner"
 import { IOSInstallPrompt } from "@/components/ios-install-prompt"
+import { NotificationManager } from "@/components/notification-manager"
 import "@/lib/utils/debug"
 
 const geist = Geist({
@@ -204,6 +205,7 @@ export default function RootLayout({
           {/* Main Content - Com padding condicional */}
           <ConditionalLayoutWrapper>
             <OfflineBanner />
+            <NotificationManager />
             <ConditionalMain>
               {children}
             </ConditionalMain>
