@@ -185,7 +185,7 @@ export default function MenuWizardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-white">
         <div className="container-responsive mx-auto px-3 py-6 md:px-6 lg:px-8">
           <div className="space-y-6">
             <Skeleton className="h-20 w-full" />
@@ -203,8 +203,8 @@ export default function MenuWizardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+        <Card className="max-w-md w-full bg-white">
           <CardContent className="pt-6 text-center">
             <AlertCircle className="w-16 h-16 mx-auto text-destructive mb-4" />
             <h2 className="text-xl font-semibold mb-2">Ops!</h2>
@@ -217,8 +217,8 @@ export default function MenuWizardPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+        <Card className="max-w-md w-full bg-white">
           <CardContent className="pt-6 text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
               <Check className="w-10 h-10 text-green-600" />
@@ -242,7 +242,7 @@ export default function MenuWizardPage() {
   const categorySelections = activeCategory?.items.filter(item => selections.has(item.id)).length || 0
 
   return (
-    <div className="min-h-screen bg-background !pb-24 md:!pb-6 !pt-0">
+    <div className="min-h-screen bg-white !pb-24 md:!pb-6 !pt-0">
       {/* Unified Header + Progress */}
       <div className="bg-white border-b sticky top-0 z-30 shadow-sm">
         <div className="container-responsive mx-auto px-3 md:px-6">

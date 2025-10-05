@@ -26,7 +26,7 @@ export default function WizardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="light">
+    <div className="light bg-white min-h-screen">
       {children}
     </div>
   )
