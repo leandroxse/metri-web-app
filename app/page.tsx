@@ -174,34 +174,34 @@ export default function HomePage() {
           </div>
           
           {/* Métricas integradas */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6">
             <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-              <AnimatedNumber 
-                value={totalActiveEvents} 
-                className="text-xl font-bold text-primary"
+              <AnimatedNumber
+                value={totalActiveEvents}
+                className="text-xl md:text-2xl font-bold text-primary"
               />
-              <p className="text-xs text-muted-foreground">Ativos</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground">Ativos</p>
             </div>
             <div className="text-center p-3 rounded-lg bg-secondary/5 border border-secondary/10">
-              <AnimatedNumber 
-                value={weeklyEvents.length} 
-                className="text-xl font-bold text-secondary"
+              <AnimatedNumber
+                value={weeklyEvents.length}
+                className="text-xl md:text-2xl font-bold text-secondary"
               />
-              <p className="text-xs text-muted-foreground">Semana</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground">Semana</p>
             </div>
             <div className="text-center p-3 rounded-lg bg-chart-3/5 border border-chart-3/10">
-              <AnimatedNumber 
-                value={totalPeopleWeek} 
-                className="text-xl font-bold text-chart-3"
+              <AnimatedNumber
+                value={totalPeopleWeek}
+                className="text-xl md:text-2xl font-bold text-chart-3"
               />
-              <p className="text-xs text-muted-foreground">Pessoas</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground">Pessoas</p>
             </div>
             <div className="text-center p-3 rounded-lg bg-chart-4/5 border border-chart-4/10">
-              <AnimatedNumber 
-                value={selectedDayEvents.length} 
-                className="text-xl font-bold text-chart-4"
+              <AnimatedNumber
+                value={selectedDayEvents.length}
+                className="text-xl md:text-2xl font-bold text-chart-4"
               />
-              <p className="text-xs text-muted-foreground">Hoje</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground">Hoje</p>
             </div>
           </div>
         </motion.header>

@@ -84,58 +84,59 @@ export default function CardapiosPage() {
       <div className="container-responsive mx-auto px-3 py-4 md:px-6 lg:px-8">
         {/* Header with Animation - NO TOPO */}
         <AnimatedContainer delay={0} direction="right" className="mb-4">
-          <div className="flex items-center justify-between">
-            <motion.h1
-              className="text-2xl font-bold flex items-center gap-2"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <motion.div
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.6 }}
-              >
-                <ChefHat className="w-6 h-6 text-orange-600" />
-              </motion.div>
-              <span className="bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
-                Biblioteca de Cardápios
-              </span>
-            </motion.h1>
-
+          <motion.h1
+            className="text-xl md:text-2xl font-bold flex items-center gap-2 mb-3"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+          >
             <motion.div
-              className="flex items-center gap-2"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
+              whileHover={{ rotate: 360 }}
+              transition={{ duration: 0.6 }}
             >
-              <Button
-                variant={showArchived ? "default" : "outline"}
-                onClick={() => setShowArchived(!showArchived)}
-                className="gap-2"
-              >
-                {showArchived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
-                {showArchived ? "Ver Ativos" : "Ver Arquivados"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => router.push('/cardapios/importar')}
-                className="gap-2"
-              >
-                <Sparkles className="w-4 h-4" />
-                Importar
-              </Button>
-              <Button onClick={handleOpenNew} className="gap-2">
-                <Plus className="w-4 h-4" />
-                Novo
-              </Button>
+              <ChefHat className="w-5 h-5 md:w-6 md:h-6 text-orange-600" />
             </motion.div>
-          </div>
+            <span className="bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
+              Cardápios
+            </span>
+          </motion.h1>
+
+          <motion.div
+            className="flex items-center gap-2 flex-wrap"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Button
+              variant={showArchived ? "default" : "outline"}
+              onClick={() => setShowArchived(!showArchived)}
+              size="sm"
+              className="gap-1.5 h-8 text-xs md:text-sm"
+            >
+              {showArchived ? <ArchiveRestore className="w-3.5 h-3.5 md:w-4 md:h-4" /> : <Archive className="w-3.5 h-3.5 md:w-4 md:h-4" />}
+              <span className="hidden sm:inline">{showArchived ? "Ver Ativos" : "Arquivados"}</span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push('/cardapios/importar')}
+              size="sm"
+              className="gap-1.5 h-8 text-xs md:text-sm bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-300 dark:border-purple-700 hover:from-purple-500/20 hover:to-pink-500/20 text-purple-700 dark:text-purple-300"
+            >
+              <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 animate-pulse" />
+              <span className="hidden sm:inline">Cardápio com IA</span>
+              <span className="sm:hidden">IA</span>
+            </Button>
+            <Button onClick={handleOpenNew} size="sm" className="gap-1.5 h-8 text-xs md:text-sm">
+              <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">Novo</span>
+            </Button>
+          </motion.div>
         </AnimatedContainer>
 
         {/* Modern Statistics - Mobile Optimized with Stagger Animation */}
         <AnimatedContainer delay={0.2} className="mb-4">
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6"
+            className="grid grid-cols-3 lg:grid-cols-3 gap-2 md:gap-4 lg:gap-6"
             initial={false}
             animate={"animate"}
             variants={{
@@ -147,7 +148,7 @@ export default function CardapiosPage() {
             }}
           >
             <motion.div
-              className="bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-950/30 dark:to-orange-900/20 oled:from-orange-400/10 oled:to-orange-300/5 rounded-xl p-4 border border-orange-200/50 dark:border-orange-800/30 oled:border-orange-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
+              className="bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-950/30 dark:to-orange-900/20 oled:from-orange-400/10 oled:to-orange-300/5 rounded-lg md:rounded-xl p-2.5 md:p-4 border border-orange-200/50 dark:border-orange-800/30 oled:border-orange-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
               variants={{
                 initial: { opacity: 0, y: 20, scale: 0.95 },
                 animate: { opacity: 1, y: 0, scale: 1 }
@@ -162,14 +163,14 @@ export default function CardapiosPage() {
                 transition: { duration: 0.2 }
               }}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-orange-700 dark:text-orange-300 oled:text-orange-200 mb-1">Total de Cardápios</p>
-                  <p className="text-xl font-bold text-orange-900 dark:text-orange-100 oled:text-orange-100">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <div className="flex items-center justify-between md:block">
+                  <p className="text-[10px] md:text-xs font-medium text-orange-700 dark:text-orange-300 oled:text-orange-200 mb-0 md:mb-1">Total</p>
+                  <p className="text-lg md:text-xl font-bold text-orange-900 dark:text-orange-100 oled:text-orange-100">
                     <AnimatedNumber value={menus.length} duration={1.5} />
                   </p>
                 </div>
-                <div className="p-2 bg-orange-500/10 dark:bg-orange-400/20 oled:bg-orange-400/30 rounded-lg">
+                <div className="hidden md:block p-2 bg-orange-500/10 dark:bg-orange-400/20 oled:bg-orange-400/30 rounded-lg">
                   <AnimatedIcon variant="bounce">
                     <ChefHat className="w-5 h-5 text-orange-600 dark:text-orange-400 oled:text-orange-300" />
                   </AnimatedIcon>
@@ -178,7 +179,7 @@ export default function CardapiosPage() {
             </motion.div>
 
             <motion.div
-              className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/20 oled:from-emerald-400/10 oled:to-emerald-300/5 rounded-xl p-4 border border-emerald-200/50 dark:border-emerald-800/30 oled:border-emerald-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
+              className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/20 oled:from-emerald-400/10 oled:to-emerald-300/5 rounded-lg md:rounded-xl p-2.5 md:p-4 border border-emerald-200/50 dark:border-emerald-800/30 oled:border-emerald-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
               variants={{
                 initial: { opacity: 0, y: 20, scale: 0.95 },
                 animate: { opacity: 1, y: 0, scale: 1 }
@@ -193,14 +194,14 @@ export default function CardapiosPage() {
                 transition: { duration: 0.2 }
               }}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300 oled:text-emerald-200 mb-1">Cardápios Ativos</p>
-                  <p className="text-xl font-bold text-emerald-900 dark:text-emerald-100 oled:text-emerald-100">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <div className="flex items-center justify-between md:block">
+                  <p className="text-[10px] md:text-xs font-medium text-emerald-700 dark:text-emerald-300 oled:text-emerald-200 mb-0 md:mb-1">Ativos</p>
+                  <p className="text-lg md:text-xl font-bold text-emerald-900 dark:text-emerald-100 oled:text-emerald-100">
                     <AnimatedNumber value={activeMenus.length} duration={1.5} />
                   </p>
                 </div>
-                <div className="p-2 bg-emerald-500/10 dark:bg-emerald-400/20 oled:bg-emerald-400/30 rounded-lg">
+                <div className="hidden md:block p-2 bg-emerald-500/10 dark:bg-emerald-400/20 oled:bg-emerald-400/30 rounded-lg">
                   <AnimatedIcon variant="pulse">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 oled:text-emerald-300" />
                   </AnimatedIcon>
@@ -209,7 +210,7 @@ export default function CardapiosPage() {
             </motion.div>
 
             <motion.div
-              className="bg-gradient-to-br from-gray-50 to-gray-100/50 dark:from-gray-950/30 dark:to-gray-900/20 oled:from-gray-400/10 oled:to-gray-300/5 rounded-xl p-4 border border-gray-200/50 dark:border-gray-800/30 oled:border-gray-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
+              className="bg-gradient-to-br from-gray-50 to-gray-100/50 dark:from-gray-950/30 dark:to-gray-900/20 oled:from-gray-400/10 oled:to-gray-300/5 rounded-lg md:rounded-xl p-2.5 md:p-4 border border-gray-200/50 dark:border-gray-800/30 oled:border-gray-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
               variants={{
                 initial: { opacity: 0, y: 20, scale: 0.95 },
                 animate: { opacity: 1, y: 0, scale: 1 }
@@ -224,14 +225,14 @@ export default function CardapiosPage() {
                 transition: { duration: 0.2 }
               }}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-gray-700 dark:text-gray-300 oled:text-gray-200 mb-1">Cardápios Inativos</p>
-                  <p className="text-xl font-bold text-gray-900 dark:text-gray-100 oled:text-gray-100">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <div className="flex items-center justify-between md:block">
+                  <p className="text-[10px] md:text-xs font-medium text-gray-700 dark:text-gray-300 oled:text-gray-200 mb-0 md:mb-1">Inativos</p>
+                  <p className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 oled:text-gray-100">
                     <AnimatedNumber value={inactiveMenus.length} duration={1.5} />
                   </p>
                 </div>
-                <div className="p-2 bg-gray-500/10 dark:bg-gray-400/20 oled:bg-gray-400/30 rounded-lg">
+                <div className="hidden md:block p-2 bg-gray-500/10 dark:bg-gray-400/20 oled:bg-gray-400/30 rounded-lg">
                   <AnimatedIcon variant="wobble">
                     <Archive className="w-5 h-5 text-gray-600 dark:text-gray-400 oled:text-gray-300" />
                   </AnimatedIcon>

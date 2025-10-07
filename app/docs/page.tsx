@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, FilePlus, FileSignature, Download, Trash2 } from "lucide-react"
+import { FileText, FilePlus, FileSignature, Download, Trash2, Share2 } from "lucide-react"
 import { useDocuments } from "@/hooks/use-documents"
 import { useContracts } from "@/hooks/use-contracts"
 import { useRouter } from "next/navigation"
@@ -32,6 +32,12 @@ export default function DocsPage() {
     completed: "Concluído",
     sent: "Enviado",
     signed: "Assinado"
+  }
+
+  const shareViaWhatsApp = (name: string, url: string) => {
+    const message = `📄 *${name}*\n\nConfira o documento: ${url}`
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
   }
 
   return (
@@ -82,7 +88,11 @@ export default function DocsPage() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {documents.map((doc) => (
-                <Card key={doc.id}>
+                <Card
+                  key={doc.id}
+                  className="cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => window.open(doc.file_url, '_blank')}
+                >
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -103,15 +113,31 @@ export default function DocsPage() {
                         size="sm"
                         variant="outline"
                         className="flex-1"
-                        onClick={() => window.open(doc.file_url, '_blank')}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          window.open(doc.file_url, '_blank')
+                        }}
                       >
                         <Download className="w-4 h-4 mr-2" />
                         Abrir
                       </Button>
                       <Button
                         size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          shareViaWhatsApp(doc.name, doc.file_url)
+                        }}
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
                         variant="ghost"
-                        onClick={() => deleteDocument(doc.id)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          deleteDocument(doc.id)
+                        }}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -150,7 +176,15 @@ export default function DocsPage() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {contracts.map((contract) => (
-                <Card key={contract.id}>
+                <Card
+                  key={contract.id}
+                  className="cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => {
+                    if (contract.generated_pdf_url) {
+                      window.open(contract.generated_pdf_url, '_blank')
+                    }
+                  }}
+                >
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -165,35 +199,59 @@ export default function DocsPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    {contract.generated_pdf_url ? (
+                    <div className="flex gap-2">
+                      {contract.generated_pdf_url ? (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              window.open(contract.generated_pdf_url!, '_blank')
+                            }}
+                          >
+                            <Download className="w-4 h-4 mr-2" />
+                            Abrir
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              shareViaWhatsApp(
+                                contract.filled_data['1'] || "Contrato",
+                                contract.generated_pdf_url!
+                              )
+                            }}
+                          >
+                            <Share2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          size="sm"
+                          className="flex-1"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            generatePDF(contract.id)
+                          }}
+                          disabled={generating}
+                        >
+                          {generating ? "Gerando..." : "Gerar PDF"}
+                        </Button>
+                      )}
                       <Button
                         size="sm"
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => window.open(contract.generated_pdf_url!, '_blank')}
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          deleteContract(contract.id)
+                        }}
                       >
-                        <Download className="w-4 h-4 mr-2" />
-                        Baixar PDF
+                        <Trash2 className="w-4 h-4" />
                       </Button>
-                    ) : (
-                      <Button
-                        size="sm"
-                        className="w-full"
-                        onClick={() => generatePDF(contract.id)}
-                        disabled={generating}
-                      >
-                        {generating ? "Gerando..." : "Gerar PDF"}
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="w-full"
-                      onClick={() => deleteContract(contract.id)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Deletar
-                    </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}

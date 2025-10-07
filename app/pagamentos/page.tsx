@@ -455,7 +455,7 @@ export default function PagamentosPage() {
         {/* Statistics Cards */}
         <AnimatedContainer delay={0} className="mb-4">
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-4 gap-3"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3"
             initial="initial"
             animate="animate"
             variants={{
@@ -468,7 +468,7 @@ export default function PagamentosPage() {
             }}
           >
             <motion.div
-              className="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 oled:from-blue-400/10 oled:to-blue-300/5 rounded-xl p-4 border border-blue-200/50 dark:border-blue-800/30 oled:border-blue-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
+              className="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 oled:from-blue-400/10 oled:to-blue-300/5 rounded-lg md:rounded-xl p-2.5 md:p-4 border border-blue-200/50 dark:border-blue-800/30 oled:border-blue-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
               variants={{
                 initial: { opacity: 0, y: 20, scale: 0.95 },
                 animate: { opacity: 1, y: 0, scale: 1 }
@@ -483,21 +483,21 @@ export default function PagamentosPage() {
                 transition: { duration: 0.2 }
               }}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-blue-700 dark:text-blue-300 oled:text-blue-200 mb-1">Total Geral</p>
-                  <p className="text-xl font-bold text-blue-900 dark:text-blue-100 oled:text-blue-100">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 md:gap-0">
+                <div className="flex items-center justify-between md:block">
+                  <p className="text-[10px] md:text-xs font-medium text-blue-700 dark:text-blue-300 oled:text-blue-200 mb-0 md:mb-1">Total</p>
+                  <p className="text-sm md:text-xl font-bold text-blue-900 dark:text-blue-100 oled:text-blue-100">
                     R$ {globalStats.totalAmount.toFixed(2)}
                   </p>
                 </div>
-                <div className="p-2 bg-blue-500/10 dark:bg-blue-400/20 oled:bg-blue-400/30 rounded-lg">
+                <div className="hidden md:block p-2 bg-blue-500/10 dark:bg-blue-400/20 oled:bg-blue-400/30 rounded-lg">
                   <DollarSign className="w-5 h-5 text-blue-600 dark:text-blue-400 oled:text-blue-300" />
                 </div>
               </div>
             </motion.div>
 
             <motion.div
-              className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/20 oled:from-emerald-400/10 oled:to-emerald-300/5 rounded-xl p-4 border border-emerald-200/50 dark:border-emerald-800/30 oled:border-emerald-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
+              className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/30 dark:to-emerald-900/20 oled:from-emerald-400/10 oled:to-emerald-300/5 rounded-lg md:rounded-xl p-2.5 md:p-4 border border-emerald-200/50 dark:border-emerald-800/30 oled:border-emerald-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
               variants={{
                 initial: { opacity: 0, y: 20, scale: 0.95 },
                 animate: { opacity: 1, y: 0, scale: 1 }
@@ -512,21 +512,21 @@ export default function PagamentosPage() {
                 transition: { duration: 0.2 }
               }}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300 oled:text-emerald-200 mb-1">Pagamentos Realizados</p>
-                  <p className="text-xl font-bold text-emerald-900 dark:text-emerald-100 oled:text-emerald-100">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 md:gap-0">
+                <div className="flex items-center justify-between md:block">
+                  <p className="text-[10px] md:text-xs font-medium text-emerald-700 dark:text-emerald-300 oled:text-emerald-200 mb-0 md:mb-1">Pagos</p>
+                  <p className="text-sm md:text-xl font-bold text-emerald-900 dark:text-emerald-100 oled:text-emerald-100">
                     R$ {globalStats.paidAmount.toFixed(2)}
                   </p>
                 </div>
-                <div className="p-2 bg-emerald-500/10 dark:bg-emerald-400/20 oled:bg-emerald-400/30 rounded-lg">
+                <div className="hidden md:block p-2 bg-emerald-500/10 dark:bg-emerald-400/20 oled:bg-emerald-400/30 rounded-lg">
                   <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 oled:text-emerald-300" />
                 </div>
               </div>
             </motion.div>
 
             <motion.div
-              className="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/30 dark:to-amber-900/20 oled:from-amber-400/10 oled:to-amber-300/5 rounded-xl p-4 border border-amber-200/50 dark:border-amber-800/30 oled:border-amber-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
+              className="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/30 dark:to-amber-900/20 oled:from-amber-400/10 oled:to-amber-300/5 rounded-lg md:rounded-xl p-2.5 md:p-4 border border-amber-200/50 dark:border-amber-800/30 oled:border-amber-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
               variants={{
                 initial: { opacity: 0, y: 20, scale: 0.95 },
                 animate: { opacity: 1, y: 0, scale: 1 }
@@ -541,21 +541,21 @@ export default function PagamentosPage() {
                 transition: { duration: 0.2 }
               }}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-amber-700 dark:text-amber-300 oled:text-amber-200 mb-1">Pendentes</p>
-                  <p className="text-xl font-bold text-amber-900 dark:text-amber-100 oled:text-amber-100">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 md:gap-0">
+                <div className="flex items-center justify-between md:block">
+                  <p className="text-[10px] md:text-xs font-medium text-amber-700 dark:text-amber-300 oled:text-amber-200 mb-0 md:mb-1">Pendentes</p>
+                  <p className="text-sm md:text-xl font-bold text-amber-900 dark:text-amber-100 oled:text-amber-100">
                     R$ {globalStats.pendingAmount.toFixed(2)}
                   </p>
                 </div>
-                <div className="p-2 bg-amber-500/10 dark:bg-amber-400/20 oled:bg-amber-400/30 rounded-lg">
+                <div className="hidden md:block p-2 bg-amber-500/10 dark:bg-amber-400/20 oled:bg-amber-400/30 rounded-lg">
                   <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400 oled:text-amber-300" />
                 </div>
               </div>
             </motion.div>
 
             <motion.div
-              className="bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-950/30 dark:to-purple-900/20 oled:from-purple-400/10 oled:to-purple-300/5 rounded-xl p-4 border border-purple-200/50 dark:border-purple-800/30 oled:border-purple-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
+              className="bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-950/30 dark:to-purple-900/20 oled:from-purple-400/10 oled:to-purple-300/5 rounded-lg md:rounded-xl p-2.5 md:p-4 border border-purple-200/50 dark:border-purple-800/30 oled:border-purple-400/20 hover:shadow-lg transition-all duration-300 cursor-pointer"
               variants={{
                 initial: { opacity: 0, y: 20, scale: 0.95 },
                 animate: { opacity: 1, y: 0, scale: 1 }
@@ -570,14 +570,14 @@ export default function PagamentosPage() {
                 transition: { duration: 0.2 }
               }}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-purple-700 dark:text-purple-300 oled:text-purple-200 mb-1">Taxa de Conclusão</p>
-                  <p className="text-xl font-bold text-purple-900 dark:text-purple-100 oled:text-purple-100">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 md:gap-0">
+                <div className="flex items-center justify-between md:block">
+                  <p className="text-[10px] md:text-xs font-medium text-purple-700 dark:text-purple-300 oled:text-purple-200 mb-0 md:mb-1">Conclusão</p>
+                  <p className="text-sm md:text-xl font-bold text-purple-900 dark:text-purple-100 oled:text-purple-100">
                     {globalStats.completionRate.toFixed(1)}%
                   </p>
                 </div>
-                <div className="p-2 bg-purple-500/10 dark:bg-purple-400/20 oled:bg-purple-400/30 rounded-lg">
+                <div className="hidden md:block p-2 bg-purple-500/10 dark:bg-purple-400/20 oled:bg-purple-400/30 rounded-lg">
                   <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400 oled:text-purple-300" />
                 </div>
               </div>
