@@ -1,17 +1,10 @@
-import { FileQuestion } from 'lucide-react'
+import { redirect } from 'next/navigation'
 
 /**
- * Página raiz - 404 discreto
- * SECURITY: Não revela existência do painel
+ * Página raiz - redireciona para /access
+ * PWA abre aqui e vai direto pro login
+ * Se já autenticado, middleware redireciona pra /central
  */
-export default function NotFoundPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center space-y-4">
-        <FileQuestion className="w-16 h-16 text-muted-foreground mx-auto" />
-        <h1 className="text-4xl font-bold text-foreground">404</h1>
-        <p className="text-muted-foreground">Página não encontrada</p>
-      </div>
-    </div>
-  )
+export default function HomePage() {
+  redirect('/access')
 }
