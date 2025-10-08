@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 import { DEFAULT_CONTRACT_VALUES } from "@/types/contract"
 import type { ContractFields } from "@/types/contract"
 import { formatCPF, numberToWords } from "@/lib/utils/contract-fields"
+import { parseEventDate } from "@/lib/utils/date-utils"
 import { useEvents } from "@/hooks/use-events"
 import {
   Select,
@@ -183,7 +184,7 @@ export default function NovoContratoPage() {
                   <SelectItem value="none">Nenhum evento</SelectItem>
                   {eventsWithoutContract.map((event) => (
                     <SelectItem key={event.id} value={event.id}>
-                      {event.title} - {new Date(event.date).toLocaleDateString('pt-BR')}
+                      {event.title} - {parseEventDate(event.date).toLocaleDateString('pt-BR')}
                     </SelectItem>
                   ))}
                 </SelectContent>

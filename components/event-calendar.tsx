@@ -9,6 +9,7 @@ import type { Event } from "@/types/event"
 import type { Category } from "@/types/category"
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, startOfWeek, endOfWeek } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { parseEventDate } from "@/lib/utils/date-utils"
 
 interface EventCalendarProps {
   events: Event[]
@@ -31,7 +32,7 @@ export function EventCalendar({ events = [], categories }: EventCalendarProps) {
 
   const getEventsForDate = (date: Date) => {
     if (!events || !Array.isArray(events)) return []
-    return events.filter((event) => isSameDay(new Date(event.date), date))
+    return events.filter((event) => isSameDay(parseEventDate(event.date), date))
   }
 
   const selectedDateEvents = selectedDate ? getEventsForDate(selectedDate) : []

@@ -200,21 +200,10 @@ export default function RootLayout({
           disableTransitionOnChange
           themes={['light', 'dark', 'oled', 'system']}
         >
-          <SidebarProvider>
-            {/* Sidebar - Tablet/Desktop apenas (condicional) */}
-            <ConditionalSidebar />
-
-            {/* Main Content - Com padding condicional */}
-            <ConditionalLayoutWrapper>
-              <OfflineBanner />
-              <NotificationManager />
-              <ConditionalMain>
-                {children}
-              </ConditionalMain>
-              <ConditionalNav />
-              <IOSInstallPrompt />
-            </ConditionalLayoutWrapper>
-          </SidebarProvider>
+          <OfflineBanner />
+          <NotificationManager />
+          <IOSInstallPrompt />
+          {children}
         </ThemeProvider>
       </body>
     </html>

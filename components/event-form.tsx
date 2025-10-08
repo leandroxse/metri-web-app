@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { DatePickerMobile } from "@/components/ui/date-picker-mobile"
-import { Plus, Minus, Calendar, Clock, FileText } from "lucide-react"
+import { Plus, Minus, Calendar, Clock, FileText, Sparkles } from "lucide-react"
 import type { Event } from "@/types/event"
 import type { Category } from "@/types/category"
 import { useContracts } from "@/hooks/use-contracts"
@@ -90,9 +90,51 @@ export function EventForm({ initialData, onSubmit, categories }: EventFormProps)
   const totalStaff = formData.staffAssignments.reduce((sum, assignment) => sum + assignment.count, 0)
   // Removido cálculo de custo total pois hourlyRate foi removido
 
+  // Função para preencher dados de teste
+  const fillTestData = () => {
+    // Gerar data aleatória nos próximos 30 dias
+    const randomDays = Math.floor(Math.random() * 30) + 1
+    const testDate = new Date()
+    testDate.setDate(testDate.getDate() + randomDays)
+    const testDateString = testDate.toISOString().split('T')[0]
+
+    setFormData({
+      title: `Evento Teste ${new Date().getTime()}`,
+      description: "Este é um evento de teste criado automaticamente para facilitar o desenvolvimento. Contém dados fictícios para todas as informações necessárias.",
+      date: testDateString,
+      startTime: "18:00",
+      endTime: "23:00",
+      location: "Salão de Festas Prime",
+      status: "planejado" as const,
+      guestCount: 150,
+      pricePerPerson: 85.00,
+      staffAssignments: categories.slice(0, Math.min(3, categories.length)).map((cat, idx) => ({
+        categoryId: cat.id,
+        count: idx + 2
+      })),
+      linkedContractId: null,
+    })
+  }
+
   return (
     <div className="bg-background rounded-lg p-4 border border-border">
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Botão de dados de teste - apenas quando criando novo evento */}
+        {!initialData && (
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={fillTestData}
+              className="gap-2 text-xs"
+            >
+              <Sparkles className="w-3 h-3" />
+              Preencher Dados de Teste
+            </Button>
+          </div>
+        )}
+
         {/* Header compacto */}
         <div className="mb-4">
           <h3 className="text-base font-medium text-foreground mb-1 flex items-center gap-2">

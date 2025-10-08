@@ -52,7 +52,7 @@ export default function ConfiguracoesPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => router.push('/categorias')} className="w-full">
+              <Button onClick={() => router.push('/central/categorias')} className="w-full">
                 Gerenciar Categorias
               </Button>
             </CardContent>
@@ -70,7 +70,7 @@ export default function ConfiguracoesPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => router.push('/admin/edit-menu-images')} className="w-full">
+              <Button onClick={() => router.push('/central/admin/edit-menu-images')} className="w-full">
                 Abrir Editor
               </Button>
             </CardContent>

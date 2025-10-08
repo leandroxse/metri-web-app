@@ -1,6 +1,6 @@
 # 🚀 METRI - Status do Projeto
 
-**Última atualização:** 02/01/2025
+**Última atualização:** 07/01/2025
 
 ## 📌 Informação Rápida
 
@@ -58,7 +58,10 @@ Publish directory: .next
 NEXT_PUBLIC_SUPABASE_URL=https://lrgaiiuoljgjasyrqjzk.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxyZ2FpaXVvbGpnamFzeXJxanprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTg2NzksImV4cCI6MjA3MTIzNDY3OX0.VN-bevJCeMC3TgzWRThoC1uyFdJXnkR0m-0vaCRin4c
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxyZ2FpaXVvbGpnamFzeXJxanprIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTY1ODY3OSwiZXhwIjoyMDcxMjM0Njc5fQ.mf5tJtki9Hrn_GdjyB_XC0SVv7Pzr9i2UAOK5R8v95s
+APP_PASSWORD_HASH=<hash_gerado_com_script>
 ```
+
+**⚠️ IMPORTANTE:** Adicionar `APP_PASSWORD_HASH` no Netlify para produção
 
 ## 🔑 GitHub Credentials
 
@@ -96,10 +99,10 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 - ✅ Cardápios Prime 001 e 002 pré-cadastrados
 - ✅ Logo Prime Buffet como marca d'água
 
-### Sistema de Documentos e Contratos (NOVO)
+### Sistema de Documentos e Contratos
 - ✅ Upload de documentos (PDFs, imagens) com drag-and-drop
 - ✅ Categorização de documentos (Contrato, NF, Recibo, Foto, Outro)
-- ✅ Hub DOCS centralizado (/docs) - **Contratos como aba padrão**
+- ✅ Hub DOCS centralizado (/central/docs) - **Contratos como aba padrão**
 - ✅ **Sistema de vinculação de contratos a eventos:**
   - Seletor de eventos ao criar contrato (apenas eventos ativos sem contrato)
   - Seletor de contratos no formulário de eventos (apenas contratos disponíveis)
@@ -109,7 +112,17 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 - ✅ Template Prime Buffet com 19 campos
 - ✅ Auto-formatação (CPF, valores, extenso)
 - ✅ Storage no Supabase (3 buckets)
-- ⏳ Sistema de form fields PDF (aguardando criação de campos no template)
+
+### Sistema de Autenticação (NOVO - 07/01/2025)
+- ✅ Autenticação simples com senha única (hash SHA-256)
+- ✅ Middleware de proteção de rotas
+- ✅ Cookie de sessão seguro (httpOnly, secure, sameSite)
+- ✅ Duração de sessão: 7 dias
+- ✅ Rotas discretas: `/access` (login) e `/central/*` (painel protegido)
+- ✅ Cardápios públicos mantidos acessíveis: `/eventos/[id]/cardapio/[token]`
+- ✅ Página raiz (`/`) como 404 discreto
+- ✅ Script para gerar hash de senha: `npm run generate-password-hash`
+- 📖 Guia completo: `AUTH-SETUP.md`
 
 ### Melhorias UX Recentes
 - ✅ Métricas de pagamento mostram apenas evento selecionado
@@ -131,20 +144,26 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 
 ```
 app/
-  ├── page.tsx                    # Dashboard principal
-  ├── layout.tsx                  # Layout root + PWA
-  ├── eventos/
-  │   ├── page.tsx               # Lista de eventos
-  │   └── [id]/cardapio/[token]/ # Wizard de seleção de cardápio
-  ├── cardapios/                 # CRUD de cardápios
-  ├── categorias/                # Categorias profissionais
-  ├── pagamentos/                # Controle de pagamentos
-  ├── docs/                      # Sistema DOCS (NOVO)
-  │   ├── page.tsx              # Hub DOCS (tabs: Documentos, Contratos)
-  │   └── contratos/novo/       # Formulário novo contrato
-  ├── configuracoes/             # Configurações
-  └── admin/
-      └── edit-menu-images/      # Editor de cardápio
+  ├── page.tsx                    # Página 404 (discreta)
+  ├── layout.tsx                  # Layout root (ThemeProvider)
+  ├── access/                     # Autenticação (NOVO)
+  │   ├── page.tsx               # Form de login
+  │   └── actions.ts             # Server Actions
+  ├── central/                    # Painel protegido (NOVO)
+  │   ├── layout.tsx             # Layout com navegação
+  │   ├── page.tsx               # Dashboard principal
+  │   ├── eventos/               # Lista de eventos
+  │   ├── pagamentos/            # Controle de pagamentos
+  │   ├── cardapios/             # CRUD de cardápios
+  │   ├── categorias/            # Categorias profissionais
+  │   ├── docs/                  # Sistema DOCS
+  │   │   ├── page.tsx          # Hub DOCS
+  │   │   └── contratos/novo/   # Novo contrato
+  │   ├── configuracoes/         # Configurações
+  │   └── admin/
+  │       └── edit-menu-images/  # Editor de cardápio
+  └── eventos/
+      └── [id]/cardapio/[token]/ # Cardápio público (SEM autenticação)
 
 components/
   ├── ui/                        # shadcn/ui components
@@ -163,15 +182,20 @@ hooks/
   └── use-contracts.ts           # Hook para contratos (NOVO)
 
 lib/
+  ├── auth/                      # Autenticação (NOVO)
+  │   ├── session.ts            # Hash, validação, tokens
+  │   └── constants.ts          # Rotas e cookies
   ├── supabase/
   │   ├── client.ts              # Cliente Supabase
   │   ├── client-services.ts
-  │   ├── document-services.ts   # CRUD documentos (NOVO)
-  │   └── contract-services.ts   # CRUD + geração PDF (NOVO)
+  │   ├── document-services.ts   # CRUD documentos
+  │   └── contract-services.ts   # CRUD + geração PDF
   └── utils/
       ├── event-status.ts        # Lógica de status de eventos
-      ├── pdf-utils.ts           # Funções pdf-lib (NOVO)
-      └── contract-fields.ts     # Helpers formatação (NOVO)
+      ├── pdf-utils.ts           # Funções pdf-lib
+      └── contract-fields.ts     # Helpers formatação
+
+middleware.ts                    # Proteção de rotas (NOVO)
 
 types/
   ├── document.ts                # Interface Document (NOVO)
@@ -180,11 +204,13 @@ types/
 scripts/
   ├── seed-cardapio-prime.ts          # Seed do Cardápio Prime 001
   ├── seed-cardapio-prime-002.ts      # Seed do Cardápio Prime 002
-  ├── create-storage-buckets.ts       # Criar buckets Supabase (NOVO)
-  └── seed-contract-template.ts       # Upload template contrato (NOVO)
+  ├── create-storage-buckets.ts       # Criar buckets Supabase
+  ├── seed-contract-template.ts       # Upload template contrato
+  └── generate-password-hash.js       # Gerar hash de senha (NOVO)
 
 docs/
-  └── DOCS-SETUP.md              # Guia de configuração DOCS (NOVO)
+  ├── DOCS-SETUP.md              # Guia de configuração DOCS
+  └── AUTH-SETUP.md              # Guia de autenticação (NOVO)
 ```
 
 ## 🔧 Comandos
@@ -202,6 +228,9 @@ npx tsx scripts/seed-cardapio-prime-002.ts  # Inserir Cardápio Prime 002
 # Setup - Sistema DOCS
 npx tsx scripts/create-storage-buckets.ts   # Criar buckets no Supabase
 npx tsx scripts/seed-contract-template.ts   # Upload template de contrato
+
+# Autenticação
+node scripts/generate-password-hash.js SuaSenha  # Gerar hash de senha
 ```
 
 ## 📦 Principais Dependências
@@ -240,10 +269,11 @@ npx tsx scripts/seed-contract-template.ts   # Upload template de contrato
 - ✅ PWA configurado
 - ✅ Sistema de cardápios completo
 - ✅ Database schema completo
+- ✅ **Autenticação implementada e funcional**
 
 ---
 
 **MCP Supabase:** ✅ Testado e funcional
-**Build Status:** ✅ OK
-**Último Commit:** 442a0e7 - "🐛 Fix: Métricas de pagamento agora mostram apenas evento selecionado"
-**Último Deploy:** Auto-deploy ativo via Netlify
+**Build Status:** ✅ OK (sem erros TypeScript)
+**Autenticação:** ✅ Senha única com hash SHA-256
+**Rotas Protegidas:** `/central/*` | **Rotas Públicas:** `/`, `/access`, `/eventos/*/cardapio/*`

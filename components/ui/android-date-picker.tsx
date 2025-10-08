@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { parseEventDate } from "@/lib/utils/date-utils"
 
 interface AndroidDatePickerProps {
   value: string
@@ -21,7 +22,7 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
   
   const [currentMonth, setCurrentMonth] = useState(() => {
     if (value) {
-      const date = new Date(value)
+      const date = parseEventDate(value)
       return new Date(fixedYear, date.getMonth(), 1)
     }
     return new Date(fixedYear, new Date().getMonth(), 1)
@@ -29,7 +30,7 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
 
   const [selectedDate, setSelectedDate] = useState(() => {
     if (value) {
-      const date = new Date(value)
+      const date = parseEventDate(value)
       return new Date(fixedYear, date.getMonth(), date.getDate())
     }
     return new Date(fixedYear, new Date().getMonth(), new Date().getDate())
@@ -142,7 +143,7 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
         className="w-full justify-start text-left font-normal h-11 bg-white/80 dark:bg-gray-800/80 oled:bg-gray-900/80 border-gray-300/60 dark:border-gray-600/60 oled:border-gray-500/60"
       >
         <Calendar className="w-4 h-4 mr-2" />
-        {value ? formatDate(new Date(value)) : "Selecionar data"}
+        {value ? formatDate(parseEventDate(value)) : "Selecionar data"}
       </Button>
 
       {isOpen && (
