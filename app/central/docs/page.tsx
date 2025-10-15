@@ -197,7 +197,7 @@ export default function DocsPage() {
             <p className="text-sm text-muted-foreground">
               {contracts.length} {contracts.length === 1 ? "contrato" : "contratos"}
             </p>
-            <Button onClick={() => router.push('/docs/contratos/novo')}>
+            <Button onClick={() => router.push('/central/docs/contratos/novo')}>
               <FilePlus className="w-4 h-4 mr-2" />
               Novo Contrato
             </Button>
@@ -210,7 +210,7 @@ export default function DocsPage() {
               <CardContent className="py-12 text-center">
                 <FileSignature className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-muted-foreground">Nenhum contrato ainda</p>
-                <Button className="mt-4" onClick={() => router.push('/docs/contratos/novo')}>
+                <Button className="mt-4" onClick={() => router.push('/central/docs/contratos/novo')}>
                   Criar Primeiro Contrato
                 </Button>
               </CardContent>

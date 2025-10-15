@@ -43,7 +43,7 @@ export default function CardapiosPage() {
   }
 
   const handleOpenEdit = (menu: Menu) => {
-    router.push(`/admin/edit-menu-images?menuId=${menu.id}`)
+    router.push(`/central/admin/edit-menu-images?menuId=${menu.id}`)
   }
 
   const handleArchive = async (menu: Menu) => {
@@ -118,7 +118,7 @@ export default function CardapiosPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => router.push('/cardapios/importar')}
+              onClick={() => router.push('/central/cardapios/importar')}
               size="sm"
               className="gap-1.5 h-8 text-xs md:text-sm bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-300 dark:border-purple-700 hover:from-purple-500/20 hover:to-pink-500/20 text-purple-700 dark:text-purple-300"
             >

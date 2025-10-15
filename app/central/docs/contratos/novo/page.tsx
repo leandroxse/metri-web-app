@@ -159,8 +159,8 @@ export default function NovoContratoPage() {
       // Resetar loading antes de navegar
       setLoading(false)
 
-      // Navegar para /docs
-      router.push('/docs')
+      // Navegar para /central/docs
+      router.push('/central/docs')
 
       // Gerar PDF em background (não bloqueia a navegação)
       // Usar setTimeout para garantir que a navegação aconteça primeiro

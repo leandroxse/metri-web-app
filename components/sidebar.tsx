@@ -15,12 +15,12 @@ export function Sidebar() {
   const { isCollapsed, toggleSidebar } = useSidebar()
 
   const navItems = [
-    { href: "/", icon: Home, label: "Início" },
-    { href: "/eventos", icon: Calendar, label: "Eventos" },
-    { href: "/pagamentos", icon: DollarSign, label: "Pagamentos" },
-    { href: "/cardapios", icon: ChefHat, label: "Cardápios" },
-    { href: "/docs", icon: FileText, label: "Docs" },
-    { href: "/configuracoes", icon: Settings, label: "Configurações" }
+    { href: "/central", icon: Home, label: "Início" },
+    { href: "/central/eventos", icon: Calendar, label: "Eventos" },
+    { href: "/central/pagamentos", icon: DollarSign, label: "Pagamentos" },
+    { href: "/central/cardapios", icon: ChefHat, label: "Cardápios" },
+    { href: "/central/docs", icon: FileText, label: "Docs" },
+    { href: "/central/configuracoes", icon: Settings, label: "Configurações" }
   ]
 
   return (
@@ -65,7 +65,7 @@ export function Sidebar() {
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href ||
-            (item.href !== "/" && pathname.startsWith(item.href))
+            (item.href !== "/central" && pathname.startsWith(item.href))
 
           return (
             <Link

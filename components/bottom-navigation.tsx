@@ -62,40 +62,40 @@ export function BottomNavigation() {
 
   const navItems = [
     {
-      href: "/",
+      href: "/central",
       icon: Home,
       label: "Início",
-      active: pathname === "/"
+      active: pathname === "/central"
     },
     {
-      href: "/eventos",
+      href: "/central/eventos",
       icon: Calendar,
       label: "Eventos",
-      active: pathname === "/eventos"
+      active: pathname === "/central/eventos"
     },
     {
-      href: "/pagamentos",
+      href: "/central/pagamentos",
       icon: DollarSign,
       label: "Pagamentos",
-      active: pathname === "/pagamentos"
+      active: pathname === "/central/pagamentos"
     },
     {
-      href: "/cardapios",
+      href: "/central/cardapios",
       icon: ChefHat,
       label: "Cardápios",
-      active: pathname === "/cardapios"
+      active: pathname === "/central/cardapios"
     },
     {
-      href: "/docs",
+      href: "/central/docs",
       icon: FileText,
       label: "Docs",
-      active: pathname.startsWith("/docs")
+      active: pathname.startsWith("/central/docs")
     },
     {
-      href: "/configuracoes",
+      href: "/central/configuracoes",
       icon: Settings,
       label: "Config",
-      active: pathname === "/configuracoes"
+      active: pathname === "/central/configuracoes"
     }
   ]
 
