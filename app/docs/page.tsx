@@ -4,12 +4,12 @@ import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, FilePlus, FileSignature, Download, Trash2, Share2 } from "lucide-react"
+import { FileText, FilePlus, FileSignature, Download, Trash2, Share2, AlertTriangle } from "lucide-react"
 import { useDocuments } from "@/hooks/use-documents"
 import { useContracts } from "@/hooks/use-contracts"
 import { useRouter } from "next/navigation"
 import { DocumentUpload } from "@/components/document-upload"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { formatDistanceToNow } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
@@ -18,6 +18,10 @@ export default function DocsPage() {
   const { documents, loading: loadingDocs, deleteDocument } = useDocuments()
   const { contracts, loading: loadingContracts, deleteContract, generatePDF, generating } = useContracts()
   const [showUpload, setShowUpload] = useState(false)
+  const [contractToDelete, setContractToDelete] = useState<string | null>(null)
+  const [deletingContract, setDeletingContract] = useState(false)
+  const [documentToDelete, setDocumentToDelete] = useState<string | null>(null)
+  const [deletingDocument, setDeletingDocument] = useState(false)
 
   const categoryLabels: Record<string, string> = {
     contract: "Contrato",
@@ -38,6 +42,44 @@ export default function DocsPage() {
     const message = `📄 *${name}*\n\nConfira o documento: ${url}`
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
+  }
+
+  const handleDeleteContract = async () => {
+    if (!contractToDelete) return
+
+    setDeletingContract(true)
+    try {
+      await deleteContract(contractToDelete)
+      setContractToDelete(null)
+    } catch (error) {
+      console.error('Erro ao deletar contrato:', error)
+    } finally {
+      setDeletingContract(false)
+    }
+  }
+
+  const getContractName = (contractId: string): string => {
+    const contract = contracts.find(c => c.id === contractId)
+    return contract?.filled_data['1'] || "Contrato"
+  }
+
+  const handleDeleteDocument = async () => {
+    if (!documentToDelete) return
+
+    setDeletingDocument(true)
+    try {
+      await deleteDocument(documentToDelete)
+      setDocumentToDelete(null)
+    } catch (error) {
+      console.error('Erro ao deletar documento:', error)
+    } finally {
+      setDeletingDocument(false)
+    }
+  }
+
+  const getDocumentName = (documentId: string): string => {
+    const doc = documents.find(d => d.id === documentId)
+    return doc?.name || "Documento"
   }
 
   return (
@@ -136,10 +178,10 @@ export default function DocsPage() {
                         variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation()
-                          deleteDocument(doc.id)
+                          setDocumentToDelete(doc.id)
                         }}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
                     </div>
                   </CardContent>
@@ -246,10 +288,10 @@ export default function DocsPage() {
                         variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation()
-                          deleteContract(contract.id)
+                          setContractToDelete(contract.id)
                         }}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
                     </div>
                   </CardContent>
@@ -259,6 +301,127 @@ export default function DocsPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Dialog de Confirmação de Exclusão de DOCUMENTO - AVISO TAXATIVO */}
+      <Dialog open={!!documentToDelete} onOpenChange={(open) => !open && setDocumentToDelete(null)}>
+        <DialogContent className="max-w-md border-destructive">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-3 bg-destructive/10 rounded-full">
+                <AlertTriangle className="w-6 h-6 text-destructive" />
+              </div>
+              <DialogTitle className="text-xl">⚠️ ATENÇÃO: Ação Irreversível</DialogTitle>
+            </div>
+            <DialogDescription asChild>
+              <div className="space-y-3 pt-4">
+                <p className="text-base font-semibold text-foreground">
+                  Você está prestes a excluir permanentemente o documento:
+                </p>
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="font-bold text-foreground">
+                    "{documentToDelete ? getDocumentName(documentToDelete) : ""}"
+                  </p>
+                </div>
+
+                <div className="bg-destructive/5 border-l-4 border-destructive p-4 rounded space-y-2">
+                  <p className="font-bold text-destructive text-sm">
+                    ⛔ ESTA AÇÃO NÃO PODE SER DESFEITA!
+                  </p>
+                  <ul className="space-y-1 text-sm text-foreground/90">
+                    <li>• O documento será excluído permanentemente do banco de dados</li>
+                    <li>• O arquivo será removido do armazenamento</li>
+                    <li>• Não há como recuperar após a exclusão</li>
+                  </ul>
+                </div>
+
+                <p className="text-sm text-muted-foreground italic">
+                  💡 Dica: Se você não tem certeza, cancele esta operação e faça backup do documento antes de excluir.
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setDocumentToDelete(null)}
+              disabled={deletingDocument}
+              className="flex-1"
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteDocument}
+              disabled={deletingDocument}
+              className="flex-1 bg-destructive hover:bg-destructive/90"
+            >
+              {deletingDocument ? "Excluindo..." : "Sim, Excluir Permanentemente"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de Confirmação de Exclusão de CONTRATO - AVISO TAXATIVO */}
+      <Dialog open={!!contractToDelete} onOpenChange={(open) => !open && setContractToDelete(null)}>
+        <DialogContent className="max-w-md border-destructive">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-3 bg-destructive/10 rounded-full">
+                <AlertTriangle className="w-6 h-6 text-destructive" />
+              </div>
+              <DialogTitle className="text-xl">⚠️ ATENÇÃO: Ação Irreversível</DialogTitle>
+            </div>
+            <DialogDescription asChild>
+              <div className="space-y-3 pt-4">
+                <p className="text-base font-semibold text-foreground">
+                  Você está prestes a excluir permanentemente o contrato:
+                </p>
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="font-bold text-foreground">
+                    "{contractToDelete ? getContractName(contractToDelete) : ""}"
+                  </p>
+                </div>
+
+                <div className="bg-destructive/5 border-l-4 border-destructive p-4 rounded space-y-2">
+                  <p className="font-bold text-destructive text-sm">
+                    ⛔ ESTA AÇÃO NÃO PODE SER DESFEITA!
+                  </p>
+                  <ul className="space-y-1 text-sm text-foreground/90">
+                    <li>• O contrato será excluído permanentemente do banco de dados</li>
+                    <li>• O arquivo PDF será removido do armazenamento</li>
+                    <li>• Todos os dados preenchidos serão perdidos</li>
+                    <li>• Não há como recuperar após a exclusão</li>
+                  </ul>
+                </div>
+
+                <p className="text-sm text-muted-foreground italic">
+                  💡 Dica: Se você não tem certeza, cancele esta operação e faça backup do contrato antes de excluir.
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setContractToDelete(null)}
+              disabled={deletingContract}
+              className="flex-1"
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteContract}
+              disabled={deletingContract}
+              className="flex-1 bg-destructive hover:bg-destructive/90"
+            >
+              {deletingContract ? "Excluindo..." : "Sim, Excluir Permanentemente"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog de Upload */}
       <Dialog open={showUpload} onOpenChange={setShowUpload}>

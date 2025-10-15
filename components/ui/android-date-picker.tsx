@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { parseEventDate } from "@/lib/utils/date-utils"
 
 interface AndroidDatePickerProps {
   value: string
@@ -21,7 +22,7 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
   
   const [currentMonth, setCurrentMonth] = useState(() => {
     if (value) {
-      const date = new Date(value)
+      const date = parseEventDate(value)
       return new Date(fixedYear, date.getMonth(), 1)
     }
     return new Date(fixedYear, new Date().getMonth(), 1)
@@ -29,11 +30,22 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
 
   const [selectedDate, setSelectedDate] = useState(() => {
     if (value) {
-      const date = new Date(value)
+      const date = parseEventDate(value)
       return new Date(fixedYear, date.getMonth(), date.getDate())
     }
-    return new Date(fixedYear, new Date().getMonth(), new Date().getDate())
+    const dataAtual = new Date()
+    return new Date(fixedYear, dataAtual.getMonth(), dataAtual.getDate())
   })
+
+  // Sincronizar selectedDate quando value prop mudar
+  useEffect(() => {
+    if (value) {
+      const date = parseEventDate(value)
+      const newDate = new Date(fixedYear, date.getMonth(), date.getDate())
+      setSelectedDate(newDate)
+      setCurrentMonth(new Date(fixedYear, date.getMonth(), 1))
+    }
+  }, [value, fixedYear])
 
   const months = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -142,7 +154,7 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
         className="w-full justify-start text-left font-normal h-11 bg-white/80 dark:bg-gray-800/80 oled:bg-gray-900/80 border-gray-300/60 dark:border-gray-600/60 oled:border-gray-500/60"
       >
         <Calendar className="w-4 h-4 mr-2" />
-        {value ? formatDate(new Date(value)) : "Selecionar data"}
+        {value ? formatDate(parseEventDate(value)) : "Selecionar data"}
       </Button>
 
       {isOpen && (
@@ -161,6 +173,7 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
               {/* Seletor de mês */}
               <div className="flex items-center justify-between mt-4">
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
                   onClick={handlePrevMonth}
@@ -168,7 +181,7 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
-                
+
                 <div className="flex-1 mx-2">
                   <select
                     value={currentMonth.getMonth()}
@@ -182,8 +195,9 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
                     ))}
                   </select>
                 </div>
-                
+
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
                   onClick={handleNextMonth}
@@ -219,14 +233,16 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
 
               {/* Botões */}
               <div className="flex gap-3 mt-6">
-                <Button 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => setIsOpen(false)}
                   className="flex-1"
                 >
                   Cancelar
                 </Button>
-                <Button 
+                <Button
+                  type="button"
                   onClick={handleConfirm}
                   className="flex-1 bg-gradient-to-r from-primary to-primary/90"
                 >

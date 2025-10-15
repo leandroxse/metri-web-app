@@ -11,7 +11,8 @@ import { useContracts } from "@/hooks/use-contracts"
 import { useToast } from "@/hooks/use-toast"
 import { DEFAULT_CONTRACT_VALUES } from "@/types/contract"
 import type { ContractFields } from "@/types/contract"
-import { formatCPF, numberToWords } from "@/lib/utils/contract-fields"
+import { formatCPF, numberToWords, formatDateExtended } from "@/lib/utils/contract-fields"
+import { parseEventDate } from "@/lib/utils/date-utils"
 import { useEvents } from "@/hooks/use-events"
 import {
   Select,
@@ -20,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { AndroidDatePicker } from "@/components/ui/android-date-picker"
 
 export default function NovoContratoPage() {
   const router = useRouter()
@@ -28,6 +30,7 @@ export default function NovoContratoPage() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
+  const [eventDateISO, setEventDateISO] = useState<string>("") // YYYY-MM-DD para o date picker
 
   // Form state com valores padrão (novos nomes de campos)
   const [formData, setFormData] = useState<ContractFields>({
@@ -35,14 +38,21 @@ export default function NovoContratoPage() {
     "1": "",
     "2": "",
     "3": "",
-    dia: "",
+    dia: "", // Vai receber YYYY-MM-DD do date picker
     "4": "",
     "5": "",
     local: "",
+    "6": 0,
+    "7": 0,
+    "8": 0,
     "9": 0,
     "10": "",
     "11": 0,
     "12": 0,
+    "13": 7,
+    "14": 0,
+    "15": 0,
+    pix: "",
     dia_assinatura: new Date().getDate(),
     mes: new Date().toLocaleDateString('pt-BR', { month: 'long' }).replace(/ç/g, 'c').replace(/ã/g, 'a')
   } as ContractFields)
@@ -58,12 +68,38 @@ export default function NovoContratoPage() {
     return isActive && !hasContract
   })
 
+  // Handler para data do evento (converte YYYY-MM-DD para formato extenso)
+  const handleEventDateChange = (dateString: string) => {
+    setEventDateISO(dateString) // Atualiza o estado ISO para o date picker
+    if (dateString) {
+      const date = parseEventDate(dateString)
+      const dateExtended = formatDateExtended(date)
+      setFormData({ ...formData, dia: dateExtended })
+    } else {
+      setFormData({ ...formData, dia: "" })
+    }
+  }
+
+  // Aplicar porcentagem de sinal
+  const applySinalPercentage = (percentage: number) => {
+    const valorTotal = formData["9"]
+    if (valorTotal > 0) {
+      const sinal = valorTotal * (percentage / 100)
+      const saldo = valorTotal - sinal
+      setFormData({
+        ...formData,
+        "11": sinal,
+        "12": saldo
+      })
+    }
+  }
+
   // Auto-calcular saldo quando mudar total ou sinal
   const handleValorChange = (field: '9' | '11', value: number) => {
     const newData = { ...formData, [field]: value }
     if (field === '9') {
-      // Quando mudar o valor total, calcular sinal como 50%
-      const sinalAuto = value * 0.5
+      // Quando mudar o valor total, calcular sinal como 30% (novo padrão)
+      const sinalAuto = value * 0.3
       newData["11"] = sinalAuto
       newData["12"] = value - sinalAuto
       newData["10"] = numberToWords(value)
@@ -101,34 +137,67 @@ export default function NovoContratoPage() {
         notes: null
       })
 
-      if (contract) {
-        toast({ title: "Contrato criado com sucesso!" })
-
-        // Gerar PDF automaticamente
-        const pdfUrl = await generatePDF(contract.id)
-
-        if (pdfUrl) {
-          toast({ title: "PDF gerado!", description: "Você pode baixar o contrato agora." })
-          router.push('/docs')
-        }
-      } else {
-        toast({ variant: "destructive", title: "Erro ao criar contrato" })
+      if (!contract) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao criar contrato",
+          description: "Não foi possível salvar o contrato. Tente novamente."
+        })
+        setLoading(false)
+        return
       }
+
+      // Contrato criado com sucesso!
+      toast({
+        title: "✅ Contrato criado!",
+        description: "Redirecionando..."
+      })
+
+      // Pequeno delay para garantir que o toast seja exibido
+      await new Promise(resolve => setTimeout(resolve, 300))
+
+      // Resetar loading antes de navegar
+      setLoading(false)
+
+      // Navegar para /docs
+      router.push('/docs')
+
+      // Gerar PDF em background (não bloqueia a navegação)
+      // Usar setTimeout para garantir que a navegação aconteça primeiro
+      setTimeout(() => {
+        generatePDF(contract.id).then(pdfUrl => {
+          if (pdfUrl) {
+            console.log('✅ PDF gerado com sucesso:', pdfUrl)
+          } else {
+            console.warn('⚠️ PDF não pôde ser gerado')
+          }
+        }).catch(error => {
+          console.error('❌ Erro ao gerar PDF:', error)
+        })
+      }, 500)
+
     } catch (error) {
-      console.error(error)
-      toast({ variant: "destructive", title: "Erro ao criar contrato" })
-    } finally {
+      console.error('❌ Erro no handleSubmit:', error)
+      toast({
+        variant: "destructive",
+        title: "Erro ao criar contrato",
+        description: "Ocorreu um erro inesperado. Tente novamente."
+      })
       setLoading(false)
     }
   }
 
   // Preencher com dados de teste
   const fillTestData = () => {
+    // Definir data de teste (15 de março de 2025)
+    const testDate = "2025-03-15"
+    setEventDateISO(testDate)
+
     setFormData({
       "1": "Maria Silva Santos",
       "2": "123.456.789-00",
       "3": "Rua das Flores, 123, Centro, São Paulo - SP",
-      dia: "15 de março de 2025",
+      dia: formatDateExtended(parseEventDate(testDate)),
       "4": "18:00",
       "5": "23:00",
       local: "Salão de Festas Estrela, Av. Paulista, 1000",
@@ -183,7 +252,7 @@ export default function NovoContratoPage() {
                   <SelectItem value="none">Nenhum evento</SelectItem>
                   {eventsWithoutContract.map((event) => (
                     <SelectItem key={event.id} value={event.id}>
-                      {event.title} - {new Date(event.date).toLocaleDateString('pt-BR')}
+                      {event.title} - {parseEventDate(event.date).toLocaleDateString('pt-BR')}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -243,12 +312,15 @@ export default function NovoContratoPage() {
             <div className="grid md:grid-cols-3 gap-4">
               <div>
                 <Label>Data do Evento *</Label>
-                <Input
-                  value={formData.dia}
-                  onChange={(e) => setFormData({ ...formData, dia: e.target.value })}
-                  placeholder="Ex: 15 de março de 2025"
-                  required
+                <AndroidDatePicker
+                  value={eventDateISO}
+                  onChange={handleEventDateChange}
                 />
+                {formData.dia && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Será preenchido como: {formData.dia}
+                  </p>
+                )}
               </div>
               <div>
                 <Label>Horário Início *</Label>
@@ -291,24 +363,27 @@ export default function NovoContratoPage() {
                 <Label>Garçons</Label>
                 <Input
                   type="number"
-                  value={formData["6"]}
-                  onChange={(e) => setFormData({ ...formData, "6": parseInt(e.target.value) || 0 })}
+                  min="0"
+                  value={formData["6"] || ""}
+                  onChange={(e) => setFormData({ ...formData, "6": e.target.value === "" ? 0 : parseInt(e.target.value) })}
                 />
               </div>
               <div>
                 <Label>Copeiros</Label>
                 <Input
                   type="number"
-                  value={formData["7"]}
-                  onChange={(e) => setFormData({ ...formData, "7": parseInt(e.target.value) || 0 })}
+                  min="0"
+                  value={formData["7"] || ""}
+                  onChange={(e) => setFormData({ ...formData, "7": e.target.value === "" ? 0 : parseInt(e.target.value) })}
                 />
               </div>
               <div>
                 <Label>Maître</Label>
                 <Input
                   type="number"
-                  value={formData["8"]}
-                  onChange={(e) => setFormData({ ...formData, "8": parseInt(e.target.value) || 0 })}
+                  min="0"
+                  value={formData["8"] || ""}
+                  onChange={(e) => setFormData({ ...formData, "8": e.target.value === "" ? 0 : parseInt(e.target.value) })}
                 />
               </div>
             </div>
@@ -318,9 +393,10 @@ export default function NovoContratoPage() {
                 <Label>Valor Total (R$) *</Label>
                 <Input
                   type="number"
+                  min="0"
                   step="0.01"
                   value={formData["9"] || ""}
-                  onChange={(e) => handleValorChange('9', parseFloat(e.target.value) || 0)}
+                  onChange={(e) => handleValorChange('9', e.target.value === "" ? 0 : parseFloat(e.target.value))}
                   placeholder="0.00"
                   required
                 />
@@ -329,12 +405,35 @@ export default function NovoContratoPage() {
                 <Label>Sinal (R$) *</Label>
                 <Input
                   type="number"
+                  min="0"
                   step="0.01"
                   value={formData["11"] || ""}
-                  onChange={(e) => handleValorChange('11', parseFloat(e.target.value) || 0)}
+                  onChange={(e) => handleValorChange('11', e.target.value === "" ? 0 : parseFloat(e.target.value))}
                   placeholder="0.00"
                   required
                 />
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applySinalPercentage(30)}
+                    className="text-xs h-7"
+                    disabled={!formData["9"]}
+                  >
+                    30%
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applySinalPercentage(50)}
+                    className="text-xs h-7"
+                    disabled={!formData["9"]}
+                  >
+                    50%
+                  </Button>
+                </div>
               </div>
               <div>
                 <Label>Saldo (R$)</Label>
@@ -362,25 +461,31 @@ export default function NovoContratoPage() {
                 <Label>Prazo para quitação (dias antes do evento)</Label>
                 <Input
                   type="number"
-                  value={formData["13"]}
-                  onChange={(e) => setFormData({ ...formData, "13": parseInt(e.target.value) || 7 })}
+                  min="0"
+                  value={formData["13"] || ""}
+                  onChange={(e) => setFormData({ ...formData, "13": e.target.value === "" ? 7 : parseInt(e.target.value) })}
+                  placeholder="7"
                 />
               </div>
               <div>
                 <Label>Convidados Excedentes</Label>
                 <Input
                   type="number"
-                  value={formData["14"]}
-                  onChange={(e) => setFormData({ ...formData, "14": parseInt(e.target.value) || 0 })}
+                  min="0"
+                  value={formData["14"] || ""}
+                  onChange={(e) => setFormData({ ...formData, "14": e.target.value === "" ? 0 : parseInt(e.target.value) })}
+                  placeholder="0"
                 />
               </div>
               <div>
                 <Label>Taxa de Atraso por Hora (R$)</Label>
                 <Input
                   type="number"
+                  min="0"
                   step="0.01"
-                  value={formData["15"]}
-                  onChange={(e) => setFormData({ ...formData, "15": parseFloat(e.target.value) || 0 })}
+                  value={formData["15"] || ""}
+                  onChange={(e) => setFormData({ ...formData, "15": e.target.value === "" ? 0 : parseFloat(e.target.value) })}
+                  placeholder="0.00"
                 />
               </div>
             </div>

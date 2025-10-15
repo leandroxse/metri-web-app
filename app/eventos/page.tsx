@@ -26,6 +26,7 @@ import { format, isToday, isTomorrow, isPast } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { isActiveEvent, isHistoryEvent } from "@/lib/utils/event-status"
 import { filledContractService } from "@/lib/supabase/contract-services"
+import { parseEventDate } from "@/lib/utils/date-utils"
 
 export default function EventosPage() {
   const { events, addEvent, updateEvent, deleteEvent } = useEvents()
@@ -46,7 +47,7 @@ export default function EventosPage() {
 
   // Calculate statistics
   const upcomingEvents = events.filter(event => {
-    const eventDate = new Date(event.date)
+    const eventDate = parseEventDate(event.date)
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
@@ -54,7 +55,7 @@ export default function EventosPage() {
   })
 
   const thisMonthEvents = events.filter(event => {
-    const eventDate = new Date(event.date)
+    const eventDate = parseEventDate(event.date)
     const today = new Date()
     return eventDate.getMonth() === today.getMonth() && eventDate.getFullYear() === today.getFullYear()
   })
@@ -65,7 +66,7 @@ export default function EventosPage() {
         (event.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (event.location || '').toLowerCase().includes(searchTerm.toLowerCase())
 
-      const eventDate = new Date(event.date)
+      const eventDate = parseEventDate(event.date)
       let matchesStatus = true
 
       switch (statusFilter) {
@@ -94,10 +95,10 @@ export default function EventosPage() {
     .sort((a, b) => {
       // Para histórico, mostrar mais recente primeiro
       if (statusFilter === "history") {
-        return new Date(b.date + 'T12:00:00').getTime() - new Date(a.date + 'T12:00:00').getTime()
+        return parseEventDate(b.date).getTime() - parseEventDate(a.date).getTime()
       }
       // Para outros filtros, mostrar mais antigo primeiro
-      return new Date(a.date + 'T12:00:00').getTime() - new Date(b.date + 'T12:00:00').getTime()
+      return parseEventDate(a.date).getTime() - parseEventDate(b.date).getTime()
     })
 
   const handleAddEvent = async (eventData: Omit<Event, "id" | "createdAt" | "updatedAt"> & { linkedContractId?: string | null }) => {
@@ -161,7 +162,7 @@ export default function EventosPage() {
     }
   }
 
-  const todayEvents = events.filter((event) => isToday(new Date(event.date)))
+  const todayEvents = events.filter((event) => isToday(parseEventDate(event.date)))
 
   return (
     <div className="min-h-screen bg-background">
@@ -410,7 +411,7 @@ export default function EventosPage() {
                   >
                       {filteredEvents.map((event, index) => {
                       const status = getEventStatus(event)
-                      const eventDate = new Date(event.date)
+                      const eventDate = parseEventDate(event.date)
                       const staffCount = event.staffAssignments.reduce((sum, assignment) => sum + assignment.count, 0)
 
                       return (

@@ -88,9 +88,9 @@ export async function fillContractPDF(
       { ourName: '15', pdfNames: ['15'], value: formatCurrency(fields['15']) },
       { ourName: 'pix', pdfNames: ['pix'], value: fields.pix },
 
-      // Assinatura (última folha)
-      { ourName: 'dia_assinatura', pdfNames: ['dia'], value: fields.dia_assinatura.toString() },
-      { ourName: 'mes', pdfNames: ['mes'], value: fields.mes },
+      // Assinatura (última folha) - usar nomes diferentes para não conflitar
+      { ourName: 'dia_assinatura', pdfNames: ['dia_assinatura', 'dia_ass'], value: fields.dia_assinatura.toString() },
+      { ourName: 'mes', pdfNames: ['mes', 'mes_assinatura'], value: fields.mes },
 
       // Campos de assinatura digital (preenchidos automaticamente no PDF)
       { ourName: 'contratante', pdfNames: ['contratante'], value: fields['1'] },

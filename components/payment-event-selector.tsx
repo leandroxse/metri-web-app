@@ -14,6 +14,7 @@ import { formatCurrency } from "@/components/metric-card"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { getStatusDisplay } from "@/lib/utils/event-status"
+import { parseEventDate } from "@/lib/utils/date-utils"
 import type { Event } from "@/types/event"
 
 interface EventStats {
@@ -153,7 +154,7 @@ export function PaymentEventSelector({
                     <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400 oled:text-gray-300">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        <span>{format(new Date(event.date), "dd/MM", { locale: ptBR })}</span>
+                        <span>{format(parseEventDate(event.date), "dd/MM", { locale: ptBR })}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />

@@ -41,6 +41,7 @@ import {
 import { ptBR } from "date-fns/locale"
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, BarChart, Bar } from "recharts"
 import { isActiveEvent } from "@/lib/utils/event-status"
+import { parseEventDate } from "@/lib/utils/date-utils"
 
 // Chart configuration for modern styling
 const chartConfig = {
@@ -72,16 +73,16 @@ export default function HomePage() {
   )
   
   const weeklyEvents = activeEvents.filter(event => {
-    const eventDate = new Date(event.date)
+    const eventDate = parseEventDate(event.date)
     return eventDate >= weekStart && eventDate <= weekEnd
   })
   
   const selectedDayEvents = weeklyEvents.filter(event => 
-    isSameDay(new Date(event.date), selectedDate)
+    isSameDay(parseEventDate(event.date), selectedDate)
   )
   
   const upcomingEvents = activeEvents.filter(event => {
-    const eventDate = new Date(event.date)
+    const eventDate = parseEventDate(event.date)
     return isAfter(eventDate, today)
   }).slice(0, 5) // Next 5 upcoming events
   
@@ -98,13 +99,13 @@ export default function HomePage() {
   // Chart data with enhanced metrics
   const getEventCount = (date: Date) => {
     return weeklyEvents.filter(event => 
-      isSameDay(new Date(event.date), date)
+      isSameDay(parseEventDate(event.date), date)
     ).length
   }
   
   const getPeopleCount = (date: Date) => {
     return weeklyEvents
-      .filter(event => isSameDay(new Date(event.date), date))
+      .filter(event => isSameDay(parseEventDate(event.date), date))
       .reduce((sum, event) => {
         return sum + (event.staffAssignments?.reduce((staffSum, assignment) => staffSum + assignment.count, 0) || 0)
       }, 0)
@@ -430,7 +431,7 @@ export default function HomePage() {
                       <div className="flex-1">
                         <h4 className="font-medium">{event.title}</h4>
                         <p className="text-sm text-muted-foreground">
-                          {format(new Date(event.date), "dd MMM", { locale: ptBR })}
+                          {format(parseEventDate(event.date), "dd MMM", { locale: ptBR })}
                         </p>
                       </div>
                     </motion.div>
