@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Users, Check, X, Save, FileText, ExternalLink } from "lucide-react"
+import { Users, Check, X, Save, FileText, ExternalLink, Download } from "lucide-react"
 import type { Event } from "@/types/event"
 import type { Category, Person } from "@/types/category"
 import { personClientService, eventTeamClientService } from "@/lib/supabase/client-services"
 import { useContracts } from "@/hooks/use-contracts"
+import { useBudgets } from "@/hooks/use-budgets"
+import { forceDownload, sanitizeFilename } from "@/lib/utils/download-utils"
 
 interface TeamManagerProps {
   event: Event
@@ -34,6 +36,10 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
   // Carregar contrato vinculado ao evento
   const { contracts } = useContracts(event.id)
   const linkedContract = contracts.find(contract => contract.event_id === event.id)
+
+  // Carregar orçamentos vinculados ao evento
+  const { budgets, templates: budgetTemplates } = useBudgets(event.id)
+  const linkedBudgets = budgets.filter(budget => budget.event_id === event.id)
 
   // Carregar equipe do evento do Supabase
   useEffect(() => {
@@ -218,8 +224,8 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
   return (
     <div className="bg-card rounded-xl p-6 shadow-sm ring-1 ring-border space-y-6">
 
-      {/* Grid de Info + Status para Desktop/Tablet */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Grid de Info + Status + Documentos para Desktop/Tablet */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Status rápido do evento */}
         <div className="bg-muted/50 rounded-lg p-4">
           <div className="flex items-center justify-between mb-3">
@@ -261,19 +267,19 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
         </div>
 
         {/* Contrato Vinculado */}
-        {linkedContract ? (
-          <div className="bg-muted/50 rounded-lg p-4">
-            <div className="mb-3">
-              <span className="text-sm font-medium text-foreground">Contrato Vinculado</span>
-            </div>
-            <div className="flex items-center justify-between">
+        <div className="bg-muted/50 rounded-lg p-4">
+          <div className="mb-3">
+            <span className="text-sm font-medium text-foreground">Contrato</span>
+          </div>
+          {linkedContract ? (
+            <div className="flex items-center justify-between bg-background rounded-lg p-3">
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <div className="p-2 bg-blue-100 dark:bg-blue-900/30 oled:bg-blue-400/20 rounded-lg flex-shrink-0">
                   <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400 oled:text-blue-300" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
-                    {linkedContract.filled_data.Contratante || linkedContract.filled_data.contratante_nome || "Contrato"}
+                    {linkedContract.filled_data["1"] || "Contrato"}
                   </p>
                 </div>
               </div>
@@ -283,17 +289,65 @@ export function TeamManager({ event, categories, onUpdateEvent }: TeamManagerPro
                 onClick={() => linkedContract.generated_pdf_url && window.open(linkedContract.generated_pdf_url, '_blank')}
                 className="h-8 text-xs flex-shrink-0 ml-2"
                 disabled={!linkedContract.generated_pdf_url}
+                title="Visualizar contrato"
               >
                 <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
-                {linkedContract.generated_pdf_url ? "Ver" : "N/A"}
+                Ver
               </Button>
             </div>
+          ) : (
+            <div className="flex items-center justify-center h-full min-h-[60px]">
+              <p className="text-xs text-muted-foreground">Nenhum contrato</p>
+            </div>
+          )}
+        </div>
+
+        {/* Orçamentos Vinculados */}
+        <div className="bg-muted/50 rounded-lg p-4">
+          <div className="mb-3">
+            <span className="text-sm font-medium text-foreground">
+              Orçamentos {linkedBudgets.length > 0 && `(${linkedBudgets.length})`}
+            </span>
           </div>
-        ) : (
-          <div className="bg-muted/50 rounded-lg p-4 flex items-center justify-center">
-            <p className="text-sm text-muted-foreground">Nenhum contrato vinculado</p>
-          </div>
-        )}
+          {linkedBudgets.length > 0 ? (
+            <div className="space-y-2">
+              {linkedBudgets.map((budget) => (
+                <div key={budget.id} className="flex items-center justify-between bg-background rounded-lg p-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="p-2 bg-green-100 dark:bg-green-900/30 oled:bg-green-400/20 rounded-lg flex-shrink-0">
+                      <FileText className="w-4 h-4 text-green-600 dark:text-green-400 oled:text-green-300" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {budget.filled_data.evento || "Orçamento"}
+                      </p>
+                      {budget.template_id && budgetTemplates.find(t => t.id === budget.template_id) && (
+                        <p className="text-xs text-muted-foreground truncate">
+                          {budgetTemplates.find(t => t.id === budget.template_id)?.name}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => budget.generated_pdf_url && window.open(budget.generated_pdf_url, '_blank')}
+                    className="h-8 text-xs flex-shrink-0 ml-2"
+                    disabled={!budget.generated_pdf_url}
+                    title="Visualizar orçamento"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
+                    Ver
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full min-h-[60px]">
+              <p className="text-xs text-muted-foreground">Nenhum orçamento</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Header com informações do evento */}

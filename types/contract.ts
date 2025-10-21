@@ -31,7 +31,7 @@ export interface ContractFields {
   pix: string                           // Chave PIX para pagamento
 
   // Assinatura (última folha)
-  dia_assinatura: number                // Dia da assinatura (1-31)
+  "dia 2": number                       // Dia da assinatura (1-31) - campo "data01" no PDF
   mes: string                           // Mês da assinatura (por extenso, SEM acento)
 }
 

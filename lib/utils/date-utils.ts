@@ -63,3 +63,23 @@ export function isDateToday(dateString: string): boolean {
     eventDate.getFullYear() === today.getFullYear()
   )
 }
+
+/**
+ * Formata uma data para o formato de orçamento com dia da semana
+ *
+ * Formato: "DD de MMMM de YYYY - dia_da_semana"
+ * Exemplo: "01 de outubro de 2025 - quinta-feira"
+ *
+ * @param dateString - String de data no formato YYYY-MM-DD
+ * @returns String formatada com dia da semana
+ */
+export function formatDateWithWeekday(dateString: string): string {
+  const date = parseEventDate(dateString)
+
+  const day = date.getDate().toString().padStart(2, '0')
+  const month = date.toLocaleDateString('pt-BR', { month: 'long' })
+  const year = date.getFullYear()
+  const weekday = date.toLocaleDateString('pt-BR', { weekday: 'long' })
+
+  return `${day} de ${month} de ${year} - ${weekday}`
+}

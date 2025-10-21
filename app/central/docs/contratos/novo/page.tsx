@@ -53,7 +53,7 @@ export default function NovoContratoPage() {
     "14": 0,
     "15": 0,
     pix: "",
-    dia_assinatura: new Date().getDate(),
+    "dia 2": new Date().getDate(),
     mes: new Date().toLocaleDateString('pt-BR', { month: 'long' }).replace(/ç/g, 'c').replace(/ã/g, 'a')
   } as ContractFields)
 
@@ -159,8 +159,8 @@ export default function NovoContratoPage() {
       // Resetar loading antes de navegar
       setLoading(false)
 
-      // Navegar para /central/docs
-      router.push('/central/docs')
+      // Navegar para /central/docs com aba de contratos selecionada
+      router.push('/central/docs?tab=contracts')
 
       // Gerar PDF em background (não bloqueia a navegação)
       // Usar setTimeout para garantir que a navegação aconteça primeiro
@@ -212,7 +212,7 @@ export default function NovoContratoPage() {
       "14": 0,
       "15": 150.00,
       pix: "51.108.023/0001-55",
-      dia_assinatura: new Date().getDate(),
+      "dia 2": new Date().getDate(),
       mes: new Date().toLocaleDateString('pt-BR', { month: 'long' }).replace(/ç/g, 'c').replace(/ã/g, 'a')
     })
     toast({ title: "Dados de teste preenchidos!" })
@@ -508,17 +508,17 @@ export default function NovoContratoPage() {
           <CardContent className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label>Dia</Label>
+                <Label>Dia da Assinatura</Label>
                 <Input
                   type="number"
                   min="1"
                   max="31"
-                  value={formData.dia_assinatura}
-                  onChange={(e) => setFormData({ ...formData, dia_assinatura: parseInt(e.target.value) || 1 })}
+                  value={formData['dia 2']}
+                  onChange={(e) => setFormData({ ...formData, 'dia 2': parseInt(e.target.value) || 1 })}
                 />
               </div>
               <div>
-                <Label>Mês (sem acento)</Label>
+                <Label>Mês da Assinatura (sem acento)</Label>
                 <Input
                   value={formData.mes}
                   onChange={(e) => setFormData({ ...formData, mes: e.target.value })}

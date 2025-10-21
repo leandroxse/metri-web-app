@@ -34,9 +34,11 @@
 - `menu_items` - Itens de cardápio
 - `event_menus` - Cardápios vinculados a eventos
 - `menu_selections` - Seleções de pratos pelos convidados
-- `documents` - Documentos e PDFs (NOVO)
-- `contract_templates` - Templates de contratos (NOVO)
-- `filled_contracts` - Contratos preenchidos (NOVO)
+- `documents` - Documentos e PDFs
+- `contract_templates` - Templates de contratos
+- `filled_contracts` - Contratos preenchidos
+- `budget_templates` - Templates de orçamentos (⏳ PENDENTE CRIAÇÃO)
+- `filled_budgets` - Orçamentos preenchidos (⏳ PENDENTE CRIAÇÃO)
 
 **Todas as tabelas têm RLS habilitado**
 
@@ -102,7 +104,7 @@ APP_PASSWORD_HASH=<hash_gerado_com_script>
 ### Sistema de Documentos e Contratos
 - ✅ Upload de documentos (PDFs, imagens) com drag-and-drop
 - ✅ Categorização de documentos (Contrato, NF, Recibo, Foto, Outro)
-- ✅ Hub DOCS centralizado (/central/docs) - **Contratos como aba padrão**
+- ✅ Hub DOCS centralizado (/central/docs) - **3 abas: Contratos, Orçamentos, Documentos**
 - ✅ **Sistema de vinculação de contratos a eventos:**
   - Seletor de eventos ao criar contrato (apenas eventos ativos sem contrato)
   - Seletor de contratos no formulário de eventos (apenas contratos disponíveis)
@@ -112,6 +114,19 @@ APP_PASSWORD_HASH=<hash_gerado_com_script>
 - ✅ Template Prime Buffet com 19 campos
 - ✅ Auto-formatação (CPF, valores, extenso)
 - ✅ Storage no Supabase (3 buckets)
+
+### Sistema de Orçamentos (⏳ EM IMPLEMENTAÇÃO - 20/01/2025)
+- ✅ Interface completa criada (aba Orçamentos em /central/docs)
+- ✅ Formulário de criação (/central/docs/orcamentos/novo)
+- ✅ Campos: evento, data, cerimonialista, pessoas, preço, total
+- ✅ Cálculo automático do total (pessoas × preço)
+- ✅ Formatação de data com dia da semana
+- ✅ Múltiplos orçamentos por evento
+- ✅ Código completo: types, services, hooks, PDF utils
+- ⏳ **PENDENTE:** Criar tabelas no Supabase (executar `scripts/create-budget-tables.sql`)
+- ⏳ **PENDENTE:** Criar buckets de storage (`budget-templates`, `filled-budgets`)
+- ⏳ **PENDENTE:** Fazer seed do template (`npx tsx scripts/seed-budget-template.ts`)
+- 📖 **Documentação:** `docs/ORCAMENTOS.md`
 
 ### Sistema de Autenticação (NOVO - 07/01/2025)
 - ✅ Autenticação simples com senha única (hash SHA-256)
@@ -178,39 +193,47 @@ components/
   └── bottom-navigation.tsx      # Navegação com DOCS (ATUALIZADO)
 
 hooks/
-  ├── use-documents.ts           # Hook para documentos (NOVO)
-  └── use-contracts.ts           # Hook para contratos (NOVO)
+  ├── use-documents.ts           # Hook para documentos
+  ├── use-contracts.ts           # Hook para contratos
+  └── use-budgets.ts             # Hook para orçamentos (NOVO)
 
 lib/
-  ├── auth/                      # Autenticação (NOVO)
+  ├── auth/                      # Autenticação
   │   ├── session.ts            # Hash, validação, tokens
   │   └── constants.ts          # Rotas e cookies
   ├── supabase/
   │   ├── client.ts              # Cliente Supabase
   │   ├── client-services.ts
   │   ├── document-services.ts   # CRUD documentos
-  │   └── contract-services.ts   # CRUD + geração PDF
+  │   ├── contract-services.ts   # CRUD + geração PDF contratos
+  │   └── budget-services.ts     # CRUD + geração PDF orçamentos (NOVO)
   └── utils/
       ├── event-status.ts        # Lógica de status de eventos
-      ├── pdf-utils.ts           # Funções pdf-lib
-      └── contract-fields.ts     # Helpers formatação
+      ├── pdf-utils.ts           # fillContractPDF + fillBudgetPDF (ATUALIZADO)
+      ├── contract-fields.ts     # Helpers formatação
+      └── date-utils.ts          # formatDateWithWeekday (ATUALIZADO)
 
 middleware.ts                    # Proteção de rotas (NOVO)
 
 types/
-  ├── document.ts                # Interface Document (NOVO)
-  └── contract.ts                # Interfaces + FIELD_POSITIONS (NOVO)
+  ├── document.ts                # Interface Document
+  ├── contract.ts                # Interfaces contratos
+  └── budget.ts                  # Interfaces orçamentos (NOVO)
 
 scripts/
   ├── seed-cardapio-prime.ts          # Seed do Cardápio Prime 001
   ├── seed-cardapio-prime-002.ts      # Seed do Cardápio Prime 002
   ├── create-storage-buckets.ts       # Criar buckets Supabase
   ├── seed-contract-template.ts       # Upload template contrato
-  └── generate-password-hash.js       # Gerar hash de senha (NOVO)
+  ├── create-budget-tables.sql        # SQL para criar tabelas de orçamento (NOVO)
+  ├── seed-budget-template.ts         # Upload template orçamento (NOVO)
+  ├── debug-budget-fields.ts          # Debug campos PDF orçamento (NOVO)
+  └── generate-password-hash.js       # Gerar hash de senha
 
 docs/
   ├── DOCS-SETUP.md              # Guia de configuração DOCS
-  └── AUTH-SETUP.md              # Guia de autenticação (NOVO)
+  ├── AUTH-SETUP.md              # Guia de autenticação
+  └── ORCAMENTOS.md              # Guia de orçamentos (NOVO)
 ```
 
 ## 🔧 Comandos
@@ -228,6 +251,11 @@ npx tsx scripts/seed-cardapio-prime-002.ts  # Inserir Cardápio Prime 002
 # Setup - Sistema DOCS
 npx tsx scripts/create-storage-buckets.ts   # Criar buckets no Supabase
 npx tsx scripts/seed-contract-template.ts   # Upload template de contrato
+
+# Setup - Sistema de Orçamentos (⏳ PENDENTE)
+# 1. Executar SQL no Supabase: scripts/create-budget-tables.sql
+# 2. Criar buckets: budget-templates e filled-budgets
+npx tsx scripts/seed-budget-template.ts     # Upload template de orçamento
 
 # Autenticação
 node scripts/generate-password-hash.js SuaSenha  # Gerar hash de senha
@@ -247,12 +275,13 @@ node scripts/generate-password-hash.js SuaSenha  # Gerar hash de senha
 
 ## ⚠️ Regras Importantes
 
-1. **NUNCA reiniciar o servidor** - já está rodando na porta 3000
-2. **Falar sempre em PT-BR** com o usuário
-3. **MCP Supabase disponível** - usar para queries quando necessário
-4. **Seguir princípios:** KISS, YAGNI, Dependency Inversion
-5. **Arquivos < 500 linhas** - refatorar se necessário
-6. **SÓ FAZER COMMIT QUANDO USUÁRIO PEDIR** - não commitar automaticamente
+1. **SEGUIR TODAS AS REGRAS DO CLAUDE.md** - Arquivo obrigatório com padrões do projeto
+2. **NUNCA reiniciar o servidor** - já está rodando na porta 3000
+3. **Falar sempre em PT-BR** com o usuário
+4. **MCP Supabase disponível** - usar para queries quando necessário
+5. **Seguir princípios:** KISS, YAGNI, Dependency Inversion
+6. **Arquivos < 500 linhas** - refatorar se necessário
+7. **SÓ FAZER COMMIT QUANDO USUÁRIO PEDIR** - não commitar automaticamente
 
 ## 🔗 Links Úteis
 
@@ -268,8 +297,9 @@ node scripts/generate-password-hash.js SuaSenha  # Gerar hash de senha
 - ✅ Netlify com auto-deploy do GitHub
 - ✅ PWA configurado
 - ✅ Sistema de cardápios completo
-- ✅ Database schema completo
+- ✅ Sistema de contratos completo
 - ✅ **Autenticação implementada e funcional**
+- ⏳ **Sistema de orçamentos em implementação** (código pronto, falta criar tabelas no Supabase)
 
 ---
 

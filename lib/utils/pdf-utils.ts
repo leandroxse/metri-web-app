@@ -1,6 +1,7 @@
 // PDF Utils - Funções para preencher PDFs com pdf-lib usando form fields
 import { PDFDocument } from 'pdf-lib'
 import type { ContractFields } from '@/types/contract'
+import type { BudgetFields } from '@/types/budget'
 import { formatCurrency } from './contract-fields'
 
 /**
@@ -46,6 +47,14 @@ export async function fillContractPDF(
     // STEP 4: Preencher campos do formulário
     console.log('✍️  Preenchendo campos...')
 
+    // DEBUG: Verificar valores dos campos de data ANTES do preenchimento
+    console.log('\n🔍 DEBUG - Valores RECEBIDOS do formulário:')
+    console.log('  - fields.dia (data do evento):', fields.dia)
+    console.log('  - fields["dia 2"] (dia da assinatura):', fields['dia 2'])
+    console.log('  - Tipo de fields["dia 2"]:', typeof fields['dia 2'])
+    console.log('\n🔍 DEBUG - TODOS os campos recebidos:')
+    console.log(JSON.stringify(fields, null, 2))
+
     // Helper para preencher campo de texto com segurança
     const fillTextField = (fieldName: string, value: string | number) => {
       try {
@@ -88,9 +97,9 @@ export async function fillContractPDF(
       { ourName: '15', pdfNames: ['15'], value: formatCurrency(fields['15']) },
       { ourName: 'pix', pdfNames: ['pix'], value: fields.pix },
 
-      // Assinatura (última folha) - usar nomes diferentes para não conflitar
-      { ourName: 'dia_assinatura', pdfNames: ['dia_assinatura', 'dia_ass'], value: fields.dia_assinatura.toString() },
-      { ourName: 'mes', pdfNames: ['mes', 'mes_assinatura'], value: fields.mes },
+      // Assinatura (última folha) - SEM FALLBACK!
+      { ourName: 'dia 2', pdfNames: ['data01'], value: fields['dia 2'].toString() },
+      { ourName: 'mes', pdfNames: ['mes'], value: fields.mes },
 
       // Campos de assinatura digital (preenchidos automaticamente no PDF)
       { ourName: 'contratante', pdfNames: ['contratante'], value: fields['1'] },
@@ -104,6 +113,16 @@ export async function fillContractPDF(
         try {
           const field = form.getTextField(pdfName)
           field.setText(String(mapping.value))
+
+          // Log especial para campos de data
+          if (pdfName === 'data01' || pdfName === 'dia') {
+            console.log(`  🎯 CAMPO DE DATA PREENCHIDO:`)
+            console.log(`     - Campo do formulário: ${mapping.ourName}`)
+            console.log(`     - Campo do PDF: ${pdfName}`)
+            console.log(`     - Valor enviado: ${mapping.value}`)
+            console.log(`     - Tipo: ${typeof mapping.value}`)
+          }
+
           console.log(`  ✅ ${mapping.ourName} -> ${pdfName}: ${mapping.value}`)
           filled = true
           break // Achou! Não precisa tentar outras variações
@@ -117,6 +136,21 @@ export async function fillContractPDF(
       }
     })
 
+    // DEBUG: Verificar valores DOS CAMPOS NO PDF após preenchimento (ANTES do flatten)
+    console.log('\n🔍 DEBUG - Valores NO PDF após preenchimento:')
+    try {
+      const diaField = form.getTextField('dia')
+      console.log('  - Campo "dia" no PDF:', diaField.getText())
+    } catch (e) {
+      console.log('  - Campo "dia" não encontrado')
+    }
+    try {
+      const data01Field = form.getTextField('data01')
+      console.log('  - Campo "data01" no PDF:', data01Field.getText())
+    } catch (e) {
+      console.log('  - Campo "data01" não encontrado')
+    }
+
     // STEP 5: Flatten form (torna campos não editáveis)
     console.log('🔒 Finalizando documento (flatten)...')
     form.flatten()
@@ -129,6 +163,85 @@ export async function fillContractPDF(
     return pdfBytes
   } catch (error) {
     console.error('❌ Erro ao preencher PDF:', error)
+    throw error
+  }
+}
+
+/**
+ * Preenche um template de PDF de orçamento com form fields usando os dados
+ *
+ * IMPORTANTE:
+ * - Template deve ter form fields criados com os mesmos nomes dos campos
+ * - Template deve ser carregado como ArrayBuffer (fetch primeiro)
+ * - Os campos são preenchidos automaticamente pelo nome
+ *
+ * @param templateUrl - URL do PDF template de orçamento com form fields
+ * @param fields - Dados do orçamento a preencher
+ * @returns PDF preenchido como Uint8Array
+ */
+export async function fillBudgetPDF(
+  templateUrl: string,
+  fields: BudgetFields
+): Promise<Uint8Array> {
+  try {
+    // STEP 1: Carregar template como ArrayBuffer
+    console.log('📄 Carregando template de orçamento...')
+    const response = await fetch(templateUrl)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch template: ${response.statusText}`)
+    }
+    const templateBytes = await response.arrayBuffer()
+
+    // STEP 2: Carregar PDF document
+    console.log('📝 Carregando documento PDF...')
+    const pdfDoc = await PDFDocument.load(templateBytes)
+
+    // STEP 3: Pegar formulário do PDF
+    const form = pdfDoc.getForm()
+    const formFields = form.getFields()
+
+    console.log(`📋 Encontrados ${formFields.length} campos no formulário`)
+
+    // Log dos campos disponíveis (debug)
+    formFields.forEach(field => {
+      console.log(`  - Campo: ${field.getName()}`)
+    })
+
+    // STEP 4: Preencher campos do formulário
+    console.log('✍️  Preenchendo campos...')
+
+    // Helper para preencher campo de texto com segurança
+    const fillTextField = (fieldName: string, value: string | number) => {
+      try {
+        const field = form.getTextField(fieldName)
+        field.setText(String(value))
+        console.log(`  ✅ ${fieldName}: ${value}`)
+      } catch (error) {
+        console.warn(`  ⚠️  Campo "${fieldName}" não encontrado no PDF`)
+      }
+    }
+
+    // Preencher campos do orçamento
+    fillTextField('evento', fields.evento)
+    fillTextField('data', fields.data)
+    fillTextField('cerimonialista', fields.cerimonialista)
+    fillTextField('pessoas1', fields.pessoas1.toString())
+    fillTextField('preço2', formatCurrency(fields['preço2']))
+    fillTextField('pessoas2', fields.pessoas2.toString())
+    fillTextField('preçotexto', formatCurrency(fields.preçotexto))
+
+    // STEP 5: Flatten form (torna campos não editáveis)
+    console.log('🔒 Finalizando documento (flatten)...')
+    form.flatten()
+
+    // STEP 6: Serializar PDF preenchido
+    console.log('💾 Salvando PDF...')
+    const pdfBytes = await pdfDoc.save()
+
+    console.log('✅ PDF de orçamento preenchido com sucesso!')
+    return pdfBytes
+  } catch (error) {
+    console.error('❌ Erro ao preencher PDF de orçamento:', error)
     throw error
   }
 }
