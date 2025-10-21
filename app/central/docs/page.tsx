@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,7 +15,7 @@ import { formatDistanceToNow } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { forceDownload, sanitizeFilename } from "@/lib/utils/download-utils"
 
-export default function DocsPage() {
+function DocsPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { documents, loading: loadingDocs, deleteDocument } = useDocuments()
@@ -684,5 +684,13 @@ export default function DocsPage() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+export default function DocsPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto p-4 md:p-6 max-w-7xl">Carregando...</div>}>
+      <DocsPageContent />
+    </Suspense>
   )
 }
