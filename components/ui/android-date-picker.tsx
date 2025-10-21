@@ -179,44 +179,40 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Selecionar Data
                 </h3>
-              </div>
-
-              {/* Seletor de ano */}
-              <div className="mb-4">
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Ano</label>
+                {/* Ano pequeno no canto direito */}
                 <select
                   value={selectedYear}
                   onChange={(e) => handleYearChange(parseInt(e.target.value))}
-                  className="w-full p-2 text-center font-medium bg-transparent border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="px-2 py-1 text-sm font-semibold text-gray-900 dark:text-white bg-transparent border border-gray-200 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 2 + i).map((year) => (
-                    <option key={year} value={year} className="bg-white dark:bg-gray-900">
+                    <option key={year} value={year} className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                       {year}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* Seletor de mês */}
+              {/* Seletor de mês (grande e centralizado) */}
               <div className="flex items-center justify-between">
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={handlePrevMonth}
-                  className="h-8 w-8 p-0"
+                  className="h-10 w-10 p-0"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-5 h-5" />
                 </Button>
 
                 <div className="flex-1 mx-2">
                   <select
                     value={currentMonth.getMonth()}
                     onChange={(e) => handleMonthSelect(parseInt(e.target.value))}
-                    className="w-full p-2 text-center font-medium bg-transparent border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full p-3 text-center text-lg font-bold text-gray-900 dark:text-white bg-transparent border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     {months.map((month, index) => (
-                      <option key={month} value={index} className="bg-white dark:bg-gray-900">
+                      <option key={month} value={index} className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                         {month}
                       </option>
                     ))}
@@ -228,9 +224,9 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
                   variant="ghost"
                   size="sm"
                   onClick={handleNextMonth}
-                  className="h-8 w-8 p-0"
+                  className="h-10 w-10 p-0"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-5 h-5" />
                 </Button>
               </div>
             </CardHeader>
