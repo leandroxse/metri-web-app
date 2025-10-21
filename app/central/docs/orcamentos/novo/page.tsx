@@ -350,7 +350,7 @@ export default function NovoOrcamentoPage() {
                 />
               </div>
               <div>
-                <Label>Preço por Pessoa (R$) *</Label>
+                <Label>Preço por Pessoa *</Label>
                 <Input
                   type="number"
                   min="0"
