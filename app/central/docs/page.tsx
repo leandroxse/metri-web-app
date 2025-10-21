@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, FilePlus, FileSignature, Download, Trash2, Share2, AlertTriangle, Receipt } from "lucide-react"
+import { FileText, FilePlus, FileSignature, Download, Trash2, Share2, AlertTriangle, Receipt, Loader2 } from "lucide-react"
 import { useDocuments } from "@/hooks/use-documents"
 import { useContracts } from "@/hooks/use-contracts"
 import { useBudgets } from "@/hooks/use-budgets"
@@ -28,6 +28,8 @@ function DocsPageContent() {
   const [deletingDocument, setDeletingDocument] = useState(false)
   const [budgetToDelete, setBudgetToDelete] = useState<string | null>(null)
   const [deletingBudget, setDeletingBudget] = useState(false)
+  const [downloadingBudget, setDownloadingBudget] = useState<string | null>(null)
+  const [downloadingContract, setDownloadingContract] = useState<string | null>(null)
 
   // Controlar aba ativa via URL
   const tabParam = searchParams.get('tab')
@@ -65,6 +67,57 @@ function DocsPageContent() {
     const message = `📄 *${name}*\n\nConfira o documento: ${url}`
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
+  }
+
+  const handleDownloadFile = async (
+    id: string,
+    url: string,
+    filename: string,
+    type: 'budget' | 'contract'
+  ) => {
+    if (type === 'budget') {
+      setDownloadingBudget(id)
+    } else {
+      setDownloadingContract(id)
+    }
+
+    try {
+      // Fetch com timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30s timeout
+
+      const response = await fetch(url, { signal: controller.signal })
+      clearTimeout(timeoutId)
+
+      if (!response.ok) throw new Error('Falha no download')
+
+      const blob = await response.blob()
+      const blobUrl = window.URL.createObjectURL(blob)
+
+      // Criar link temporário e forçar download
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = filename
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(blobUrl)
+      }, 100)
+
+    } catch (error) {
+      console.error('Erro ao baixar:', error)
+      alert('Erro ao baixar o arquivo. Tente novamente.')
+    } finally {
+      if (type === 'budget') {
+        setDownloadingBudget(null)
+      } else {
+        setDownloadingContract(null)
+      }
+    }
   }
 
   const handleDeleteContract = async () => {
@@ -316,14 +369,24 @@ function DocsPageContent() {
                           <Button
                             size="sm"
                             variant="default"
+                            disabled={downloadingBudget === budget.id}
                             onClick={(e) => {
                               e.stopPropagation()
                               const filename = sanitizeFilename(`Orcamento_${budget.filled_data.evento || 'Prime_Buffet'}.pdf`)
-                              forceDownload(budget.generated_pdf_url!, filename)
+                              handleDownloadFile(budget.id, budget.generated_pdf_url!, filename, 'budget')
                             }}
                           >
-                            <Download className="w-4 h-4 mr-2" />
-                            Baixar
+                            {downloadingBudget === budget.id ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Baixando...
+                              </>
+                            ) : (
+                              <>
+                                <Download className="w-4 h-4 mr-2" />
+                                Baixar
+                              </>
+                            )}
                           </Button>
                           <Button
                             size="sm"
@@ -437,14 +500,24 @@ function DocsPageContent() {
                           <Button
                             size="sm"
                             variant="default"
+                            disabled={downloadingContract === contract.id}
                             onClick={(e) => {
                               e.stopPropagation()
                               const filename = sanitizeFilename(`Contrato_${contract.filled_data['1'] || 'Prime_Buffet'}.pdf`)
-                              forceDownload(contract.generated_pdf_url!, filename)
+                              handleDownloadFile(contract.id, contract.generated_pdf_url!, filename, 'contract')
                             }}
                           >
-                            <Download className="w-4 h-4 mr-2" />
-                            Baixar
+                            {downloadingContract === contract.id ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Baixando...
+                              </>
+                            ) : (
+                              <>
+                                <Download className="w-4 h-4 mr-2" />
+                                Baixar
+                              </>
+                            )}
                           </Button>
                           <Button
                             size="sm"

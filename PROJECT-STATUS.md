@@ -1,6 +1,6 @@
 # 🚀 METRI - Status do Projeto
 
-**Última atualização:** 07/01/2025
+**Última atualização:** 20/01/2025
 
 ## 📌 Informação Rápida
 
@@ -37,8 +37,8 @@
 - `documents` - Documentos e PDFs
 - `contract_templates` - Templates de contratos
 - `filled_contracts` - Contratos preenchidos
-- `budget_templates` - Templates de orçamentos (⏳ PENDENTE CRIAÇÃO)
-- `filled_budgets` - Orçamentos preenchidos (⏳ PENDENTE CRIAÇÃO)
+- `budget_templates` - Templates de orçamentos (5 templates ativos)
+- `filled_budgets` - Orçamentos preenchidos
 
 **Todas as tabelas têm RLS habilitado**
 
@@ -115,18 +115,20 @@ APP_PASSWORD_HASH=<hash_gerado_com_script>
 - ✅ Auto-formatação (CPF, valores, extenso)
 - ✅ Storage no Supabase (3 buckets)
 
-### Sistema de Orçamentos (⏳ EM IMPLEMENTAÇÃO - 20/01/2025)
-- ✅ Interface completa criada (aba Orçamentos em /central/docs)
-- ✅ Formulário de criação (/central/docs/orcamentos/novo)
-- ✅ Campos: evento, data, cerimonialista, pessoas, preço, total
-- ✅ Cálculo automático do total (pessoas × preço)
+### Sistema de Orçamentos
+- ✅ CRUD completo de orçamentos
+- ✅ 5 templates ativos: Prime 001, Prime 002 (bacalhau), Açaí, Coquetel, Mesa de Frios
+- ✅ Seletor de templates no formulário de criação
+- ✅ Vinculação opcional a eventos (múltiplos orçamentos por evento)
+- ✅ Campos auto-calculados: total = pessoas × preço
+- ✅ Date picker customizado com ano editável e tema escuro otimizado
 - ✅ Formatação de data com dia da semana
-- ✅ Múltiplos orçamentos por evento
-- ✅ Código completo: types, services, hooks, PDF utils
-- ⏳ **PENDENTE:** Criar tabelas no Supabase (executar `scripts/create-budget-tables.sql`)
-- ⏳ **PENDENTE:** Criar buckets de storage (`budget-templates`, `filled-budgets`)
-- ⏳ **PENDENTE:** Fazer seed do template (`npx tsx scripts/seed-budget-template.ts`)
-- 📖 **Documentação:** `docs/ORCAMENTOS.md`
+- ✅ Geração automática de PDFs preenchidos
+- ✅ Exibição de orçamentos vinculados no TeamManager
+- ✅ Hub DOCS com aba Orçamentos + persistência de tabs via URL
+- ✅ Storage buckets: `budget-templates`, `filled-budgets`
+- ✅ Scripts de seed e atualização de templates
+- 📖 Documentação: `docs/ORCAMENTOS.md`
 
 ### Sistema de Autenticação (NOVO - 07/01/2025)
 - ✅ Autenticação simples com senha única (hash SHA-256)
@@ -149,7 +151,11 @@ APP_PASSWORD_HASH=<hash_gerado_com_script>
 - ✅ **Optimistic UI em pagamentos** (salvamento em background, resposta instantânea)
 - ✅ Valores editados mantidos ao marcar como pago
 - ✅ Card inteiro clicável para marcar/desmarcar pagamento
-- ✅ Sistema de vinculação contrato-evento (contratos ao invés de documentos gerais)
+- ✅ Sistema de vinculação contrato-evento e orçamento-evento
+- ✅ TeamManager com layout 3 colunas: Status | Contrato | Orçamentos
+- ✅ Template badges inline nos cards de orçamento
+- ✅ Date picker com visibilidade otimizada para dark mode
+- ✅ Layout date picker: ano pequeno (topo-direita) + mês grande centralizado
 
 ### Performance
 - ✅ **Fire-and-forget pattern** para pagamentos (UI não bloqueia durante salvamento)
@@ -172,8 +178,9 @@ app/
   │   ├── cardapios/             # CRUD de cardápios
   │   ├── categorias/            # Categorias profissionais
   │   ├── docs/                  # Sistema DOCS
-  │   │   ├── page.tsx          # Hub DOCS
-  │   │   └── contratos/novo/   # Novo contrato
+  │   │   ├── page.tsx          # Hub DOCS (3 abas: Contratos, Orçamentos, Documentos)
+  │   │   ├── contratos/novo/   # Novo contrato
+  │   │   └── orcamentos/novo/  # Novo orçamento
   │   ├── configuracoes/         # Configurações
   │   └── admin/
   │       └── edit-menu-images/  # Editor de cardápio
@@ -181,21 +188,23 @@ app/
       └── [id]/cardapio/[token]/ # Cardápio público (SEM autenticação)
 
 components/
-  ├── ui/                        # shadcn/ui components
-  ├── wizard/                    # Componentes do wizard de cardápio
-  ├── menu-editor.tsx            # Editor completo de cardápios
-  ├── menu-form.tsx              # Formulário de cardápio
-  ├── menu-viewer.tsx            # Visualizador de cardápio
-  ├── event-menu-link.tsx        # Compartilhamento WhatsApp
-  ├── payment-*.tsx              # Componentes de pagamento
-  ├── document-upload.tsx        # Upload de documentos (NOVO)
-  ├── team-manager.tsx           # Gerenciador equipe + docs (ATUALIZADO)
-  └── bottom-navigation.tsx      # Navegação com DOCS (ATUALIZADO)
+  ├── ui/
+  │   ├── android-date-picker.tsx  # Date picker customizado (ano editável + dark mode)
+  │   └── ...                      # Demais shadcn/ui components
+  ├── wizard/                      # Componentes do wizard de cardápio
+  ├── menu-editor.tsx              # Editor completo de cardápios
+  ├── menu-form.tsx                # Formulário de cardápio
+  ├── menu-viewer.tsx              # Visualizador de cardápio
+  ├── event-menu-link.tsx          # Compartilhamento WhatsApp
+  ├── payment-*.tsx                # Componentes de pagamento
+  ├── document-upload.tsx          # Upload de documentos
+  ├── team-manager.tsx             # 3 colunas: Status | Contrato | Orçamentos
+  └── bottom-navigation.tsx        # Navegação com DOCS
 
 hooks/
   ├── use-documents.ts           # Hook para documentos
   ├── use-contracts.ts           # Hook para contratos
-  └── use-budgets.ts             # Hook para orçamentos (NOVO)
+  └── use-budgets.ts             # Hook para orçamentos (5 templates)
 
 lib/
   ├── auth/                      # Autenticação
@@ -206,34 +215,37 @@ lib/
   │   ├── client-services.ts
   │   ├── document-services.ts   # CRUD documentos
   │   ├── contract-services.ts   # CRUD + geração PDF contratos
-  │   └── budget-services.ts     # CRUD + geração PDF orçamentos (NOVO)
+  │   └── budget-services.ts     # CRUD + geração PDF orçamentos
   └── utils/
       ├── event-status.ts        # Lógica de status de eventos
-      ├── pdf-utils.ts           # fillContractPDF + fillBudgetPDF (ATUALIZADO)
-      ├── contract-fields.ts     # Helpers formatação
-      └── date-utils.ts          # formatDateWithWeekday (ATUALIZADO)
+      ├── pdf-utils.ts           # fillContractPDF + fillBudgetPDF
+      ├── contract-fields.ts     # Helpers formatação (CPF, valores, extenso)
+      └── date-utils.ts          # formatDateWithWeekday, parseEventDate
 
 middleware.ts                    # Proteção de rotas (NOVO)
 
 types/
   ├── document.ts                # Interface Document
   ├── contract.ts                # Interfaces contratos
-  └── budget.ts                  # Interfaces orçamentos (NOVO)
+  └── budget.ts                  # BudgetTemplate, FilledBudget, BudgetFields
 
 scripts/
   ├── seed-cardapio-prime.ts          # Seed do Cardápio Prime 001
   ├── seed-cardapio-prime-002.ts      # Seed do Cardápio Prime 002
   ├── create-storage-buckets.ts       # Criar buckets Supabase
   ├── seed-contract-template.ts       # Upload template contrato
-  ├── create-budget-tables.sql        # SQL para criar tabelas de orçamento (NOVO)
-  ├── seed-budget-template.ts         # Upload template orçamento (NOVO)
-  ├── debug-budget-fields.ts          # Debug campos PDF orçamento (NOVO)
+  ├── update-contract-template.ts     # Atualizar template contrato
+  ├── create-budget-tables.sql        # SQL criar tabelas orçamento
+  ├── seed-all-budget-templates.ts    # Seed dos 5 templates de orçamento
+  ├── update-budget-templates.ts      # Atualizar múltiplos templates
+  ├── update-prime-001.ts             # Atualizar apenas Prime 001
+  ├── debug-budget-fields.ts          # Debug campos PDF orçamento
   └── generate-password-hash.js       # Gerar hash de senha
 
 docs/
   ├── DOCS-SETUP.md              # Guia de configuração DOCS
   ├── AUTH-SETUP.md              # Guia de autenticação
-  └── ORCAMENTOS.md              # Guia de orçamentos (NOVO)
+  └── ORCAMENTOS.md              # Guia completo de orçamentos
 ```
 
 ## 🔧 Comandos
@@ -249,13 +261,14 @@ npx tsx scripts/seed-cardapio-prime.ts      # Inserir Cardápio Prime 001
 npx tsx scripts/seed-cardapio-prime-002.ts  # Inserir Cardápio Prime 002
 
 # Setup - Sistema DOCS
-npx tsx scripts/create-storage-buckets.ts   # Criar buckets no Supabase
-npx tsx scripts/seed-contract-template.ts   # Upload template de contrato
+npx tsx scripts/create-storage-buckets.ts      # Criar buckets no Supabase
+npx tsx scripts/seed-contract-template.ts      # Upload template de contrato
+npx tsx scripts/update-contract-template.ts    # Atualizar template contrato
 
-# Setup - Sistema de Orçamentos (⏳ PENDENTE)
-# 1. Executar SQL no Supabase: scripts/create-budget-tables.sql
-# 2. Criar buckets: budget-templates e filled-budgets
-npx tsx scripts/seed-budget-template.ts     # Upload template de orçamento
+# Setup - Sistema de Orçamentos
+npx tsx scripts/seed-all-budget-templates.ts   # Upload dos 5 templates
+npx tsx scripts/update-budget-templates.ts     # Atualizar múltiplos templates
+npx tsx scripts/update-prime-001.ts            # Atualizar apenas Prime 001
 
 # Autenticação
 node scripts/generate-password-hash.js SuaSenha  # Gerar hash de senha
@@ -298,8 +311,8 @@ node scripts/generate-password-hash.js SuaSenha  # Gerar hash de senha
 - ✅ PWA configurado
 - ✅ Sistema de cardápios completo
 - ✅ Sistema de contratos completo
+- ✅ **Sistema de orçamentos completo** (5 templates, CRUD, vinculação, PDF)
 - ✅ **Autenticação implementada e funcional**
-- ⏳ **Sistema de orçamentos em implementação** (código pronto, falta criar tabelas no Supabase)
 
 ---
 
