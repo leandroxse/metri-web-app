@@ -16,36 +16,44 @@ interface AndroidDatePickerProps {
 
 export function AndroidDatePicker({ value, onChange, className }: AndroidDatePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
-  
-  // Ano fixo em 2025
-  const fixedYear = 2025
-  
+
+  // Ano editável (padrão: ano atual)
+  const [selectedYear, setSelectedYear] = useState(() => {
+    if (value) {
+      const date = parseEventDate(value)
+      return date.getFullYear()
+    }
+    return new Date().getFullYear()
+  })
+
   const [currentMonth, setCurrentMonth] = useState(() => {
     if (value) {
       const date = parseEventDate(value)
-      return new Date(fixedYear, date.getMonth(), 1)
+      return new Date(date.getFullYear(), date.getMonth(), 1)
     }
-    return new Date(fixedYear, new Date().getMonth(), 1)
+    return new Date(new Date().getFullYear(), new Date().getMonth(), 1)
   })
 
   const [selectedDate, setSelectedDate] = useState(() => {
     if (value) {
       const date = parseEventDate(value)
-      return new Date(fixedYear, date.getMonth(), date.getDate())
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate())
     }
     const dataAtual = new Date()
-    return new Date(fixedYear, dataAtual.getMonth(), dataAtual.getDate())
+    return new Date(dataAtual.getFullYear(), dataAtual.getMonth(), dataAtual.getDate())
   })
 
   // Sincronizar selectedDate quando value prop mudar
   useEffect(() => {
     if (value) {
       const date = parseEventDate(value)
-      const newDate = new Date(fixedYear, date.getMonth(), date.getDate())
+      const year = date.getFullYear()
+      const newDate = new Date(year, date.getMonth(), date.getDate())
       setSelectedDate(newDate)
-      setCurrentMonth(new Date(fixedYear, date.getMonth(), 1))
+      setCurrentMonth(new Date(year, date.getMonth(), 1))
+      setSelectedYear(year)
     }
-  }, [value, fixedYear])
+  }, [value])
 
   const months = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -53,7 +61,7 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
   ]
 
   const formatDate = (date: Date) => {
-    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${fixedYear}`
+    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`
   }
 
   const handleConfirm = () => {
@@ -70,9 +78,9 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
     setCurrentMonth(prev => {
       const newMonth = prev.getMonth() - 1
       if (newMonth < 0) {
-        return new Date(fixedYear, 11, 1) // Dezembro
+        return new Date(selectedYear, 11, 1) // Dezembro
       }
-      return new Date(fixedYear, newMonth, 1)
+      return new Date(selectedYear, newMonth, 1)
     })
   }
 
@@ -80,14 +88,20 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
     setCurrentMonth(prev => {
       const newMonth = prev.getMonth() + 1
       if (newMonth > 11) {
-        return new Date(fixedYear, 0, 1) // Janeiro
+        return new Date(selectedYear, 0, 1) // Janeiro
       }
-      return new Date(fixedYear, newMonth, 1)
+      return new Date(selectedYear, newMonth, 1)
     })
   }
 
   const handleMonthSelect = (monthIndex: number) => {
-    setCurrentMonth(new Date(fixedYear, monthIndex, 1))
+    setCurrentMonth(new Date(selectedYear, monthIndex, 1))
+  }
+
+  const handleYearChange = (year: number) => {
+    setSelectedYear(year)
+    setCurrentMonth(new Date(year, currentMonth.getMonth(), 1))
+    setSelectedDate(new Date(year, selectedDate.getMonth(), selectedDate.getDate()))
   }
 
   const handleDateSelect = (date: Date) => {
@@ -161,17 +175,30 @@ export function AndroidDatePicker({ value, onChange, className }: AndroidDatePic
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <Card className="w-full max-w-md bg-white dark:bg-gray-900 shadow-2xl border-0">
             <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Selecionar Data
                 </h3>
-                <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                  Ano: {fixedYear}
-                </div>
               </div>
-              
+
+              {/* Seletor de ano */}
+              <div className="mb-4">
+                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Ano</label>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => handleYearChange(parseInt(e.target.value))}
+                  className="w-full p-2 text-center font-medium bg-transparent border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 2 + i).map((year) => (
+                    <option key={year} value={year} className="bg-white dark:bg-gray-900">
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Seletor de mês */}
-              <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center justify-between">
                 <Button
                   type="button"
                   variant="ghost"
